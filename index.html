@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ======================================= */
-        /* 1. PALET WARNA & VARIABEL BARU (PROFESSIONAL) */
+        /* 1. PALET WARNA & VARIABEL (PROFESSIONAL) */
         /* ======================================= */
         :root {
             --primary-color: #1e40af; /* Deep Corporate Blue */
@@ -23,6 +23,7 @@
             --warning-color: #f59e0b; /* Amber/Orange for warning */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --bottom-bar-height: 60px; /* Tinggi Bottom Bar */
         }
 
         /* ======================================= */
@@ -36,12 +37,17 @@
             color: var(--text-color);
             line-height: 1.6;
             min-height: 100vh;
+            /* Ruang untuk bottom bar di mobile */
+            padding-bottom: calc(15px + var(--bottom-bar-height)); 
         }
         
-        /* Padding lebih besar untuk desktop */
         @media (min-width: 900px) {
              body {
                  padding: 30px;
+                 padding-bottom: 30px; /* Non-mobile, bottom bar dihilangkan */
+             }
+             .bottom-bar {
+                 display: none;
              }
         }
 
@@ -49,9 +55,11 @@
             max-width: 1100px;
             margin: 0 auto;
             background-color: var(--bg-card);
-            border-radius: 10px; /* Lebih profesional */
+            border-radius: 10px;
             box-shadow: var(--shadow-lg);
-            padding: 25px; /* Sedikit lebih besar */
+            padding: 25px;
+            /* Sesuaikan tinggi agar tidak menabrak bottom bar */
+            min-height: calc(100vh - 60px - 50px); 
         }
         
         h1 {
@@ -61,6 +69,15 @@
             font-weight: 700;
             font-size: 2.2em;
         }
+        
+        /* Tab Content Styling */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
 
         /* ======================================= */
         /* 3. HEADER & BUTTONS */
@@ -79,7 +96,7 @@
             color: var(--light-text-color);
             padding: 10px 20px;
             border: none;
-            border-radius: 8px; /* Lebih kecil */
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9em;
             font-weight: 600;
@@ -89,12 +106,11 @@
         }
 
         .btn:hover {
-            background-color: #1d4ed8; /* Slightly darker primary */
+            background-color: #1d4ed8;
             transform: translateY(-1px);
             box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.1);
         }
         
-        /* Language Toggle Button Styling */
         #languageToggleBtn {
             background-color: var(--secondary-color); 
             padding: 8px 15px;
@@ -105,7 +121,6 @@
             background-color: #4b5563;
         }
         
-        /* Responsif Header Actions */
         @media (max-width: 600px) {
             .header-actions {
                 flex-direction: column;
@@ -117,26 +132,23 @@
             }
         }
 
-
         /* --- STYLING TIMELINE --- */
 
-        /* Sembunyikan semua elemen tabel (tetap sama) */
+        /* Sembunyikan tabel lama jika ada */
         table, thead, tbody, th, td, tr, .table-responsive, #jobTable {
             display: none; 
         }
 
-        /* Timeline Container */
         .job-timeline {
             display: flex;
             flex-direction: column;
-            gap: 30px; /* Jarak antar Job Group sedikit lebih renggang */
+            gap: 30px;
             margin-top: 15px;
         }
 
-        /* Individual Job Group - Kartu Utama */
         .timeline-job-group {
             background-color: var(--bg-card);
-            border-radius: 8px; /* Lebih profesional */
+            border-radius: 8px;
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             border: 1px solid var(--border-color);
@@ -148,9 +160,8 @@
              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
-        /* Job Summary Header (Latest Status) */
         .job-summary-header {
-            padding: 18px 25px; /* Padding lebih besar */
+            padding: 18px 25px;
             background-color: var(--primary-color);
             color: var(--light-text-color);
             display: flex;
@@ -175,7 +186,6 @@
         }
         
         .job-summary-header .btn {
-            /* Button style for Delete and Update in header */
             padding: 5px 10px;
             font-size: 0.7em;
             background-color: var(--error-color); 
@@ -183,7 +193,6 @@
             border-radius: 6px;
         }
         
-        /* Responsif Job Summary Header */
         @media (max-width: 500px) {
             .job-summary-header {
                 flex-direction: column;
@@ -205,7 +214,6 @@
             padding: 20px 15px 10px 45px; 
         }
 
-        /* Garis Timeline Vertikal */
         .timeline-events::before {
             content: '';
             position: absolute;
@@ -216,13 +224,11 @@
             background-color: var(--border-color);
         }
 
-        /* Event Node */
         .timeline-event {
             position: relative;
-            padding: 0 0 30px 30px; /* Sedikit lebih renggang */
+            padding: 0 0 30px 30px; 
         }
 
-        /* Dot Marker */
         .timeline-event::before {
             content: '';
             position: absolute;
@@ -237,12 +243,11 @@
             transition: background-color 0.3s;
         }
 
-        /* Event Content - Kartu Riwayat */
         .event-content {
             background-color: var(--bg-light);
             padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid var(--accent-color); /* Garis tipis */
+            border-left: 4px solid var(--accent-color);
             box-shadow: var(--shadow-sm);
         }
 
@@ -293,25 +298,15 @@
             border-radius: 6px;
         }
         
-        /* Status coloring for the dot */
         .timeline-event[data-status-key="status_done"]::before,
-        .timeline-event[data-status-key="status_selesai"]::before {
-            background-color: var(--success-color); 
-        }
-
-        .timeline-event[data-status-key="status_blocked"]::before {
-            background-color: var(--error-color); 
-        }
-
-        .timeline-event[data-status-key="status_inprogress"]::before {
-            background-color: var(--warning-color); 
-        }
+        .timeline-event[data-status-key="status_selesai"]::before { background-color: var(--success-color); }
+        .timeline-event[data-status-key="status_blocked"]::before { background-color: var(--error-color); }
+        .timeline-event[data-status-key="status_inprogress"]::before { background-color: var(--warning-color); }
         
-        /* Status Badges */
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
-            border-radius: 4px; /* Lebih kotak, lebih profesional */
+            border-radius: 4px;
             font-size: 0.7em;
             font-weight: 700;
             text-transform: uppercase;
@@ -319,13 +314,11 @@
             white-space: nowrap;
             letter-spacing: 0.5px;
         }
-        /* Definisi warna badge */
-        .status-badge.to-do { background-color: #6b7280; } /* Abu-abu sedang */
+        .status-badge.to-do { background-color: #6b7280; }
         .status-badge.in-progress { background-color: var(--warning-color); color: var(--secondary-color); }
         .status-badge.done, .status-badge.selesai, .status-badge.completed { background-color: var(--success-color); }
         .status-badge.blocked { background-color: var(--error-color); }
         .status-badge.cancelled, .status-badge.dibatalkan { background-color: #4b5563; }
-        /* Fase Badges */
         .status-badge.perencanaan, .status-badge.planning { background-color: #1e40af; }
         .status-badge.implementasi, .status-badge.implementation { background-color: #06b6d4; }
         .status-badge.testing { background-color: #6366f1; }
@@ -334,7 +327,123 @@
 
 
         /* ======================================= */
-        /* 4. MODAL STYLING (Dioptimalkan untuk Mobile) */
+        /* 4. BOTTOM BAR & TAB STYLING (BARU) */
+        /* ======================================= */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-bar-height);
+            background-color: var(--bg-card);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 900;
+        }
+
+        .tab-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 5px 0;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+        }
+
+        .tab-button .icon {
+            font-size: 1.4em;
+            margin-bottom: 3px;
+        }
+        
+        /* ======================================= */
+        /* 5. SETTINGS TAB STYLING (BARU) */
+        /* ======================================= */
+        
+        .settings-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-light);
+        }
+
+        .settings-section h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .options-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.9em;
+            color: var(--secondary-color);
+        }
+
+        .options-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .options-list .option-name {
+             font-weight: 500;
+        }
+        
+        .options-list .option-name span {
+             display: inline-block;
+             margin-left: 10px;
+             font-style: italic;
+             font-size: 0.9em;
+             color: var(--text-color);
+        }
+        
+        .options-list .btn-delete-option {
+            background-color: var(--error-color);
+            padding: 4px 8px;
+            font-size: 0.6em;
+            border-radius: 4px;
+        }
+        
+        .add-option-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .add-option-form input[type="text"] {
+            flex-grow: 1;
+            border-radius: 6px;
+        }
+        
+        .add-option-form .btn {
+            padding: 8px 15px;
+            font-size: 0.8em;
+            background-color: var(--success-color);
+        }
+
+
+        /* ======================================= */
+        /* 6. MODAL STYLING */
         /* ======================================= */
         .modal {
             display: none;
@@ -345,7 +454,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.6); /* Lebih gelap sedikit */
+            background-color: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             justify-content: center;
@@ -359,7 +468,7 @@
 
         .modal-content {
             background-color: var(--bg-card);
-            padding: 30px; /* Lebih banyak padding */
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%; 
@@ -368,7 +477,6 @@
             animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
         }
         
-        /* Di Mobile, buat modal lebih tinggi */
         @media (max-width: 550px) {
             .modal-content {
                 max-width: 95%;
@@ -394,7 +502,7 @@
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color); /* Border lebih tipis */
+            border-bottom: 1px solid var(--border-color);
         }
 
         .modal-header h2 {
@@ -407,13 +515,12 @@
         .close-btn {
             color: var(--secondary-color);
             font-size: 30px;
-            font-weight: 300; /* Lebih tipis */
+            font-weight: 300;
             cursor: pointer;
             transition: color 0.3s ease;
             line-height: 1; 
         }
         
-        /* Form Styling */
         .form-group {
             margin-bottom: 20px;
         }
@@ -456,11 +563,10 @@
         }
 
         .btn-secondary {
-            background-color: #6b7280; /* Gray for secondary action */
+            background-color: #6b7280;
             color: white;
         }
         
-        /* Generic Modal Specific Styles (Alert/Confirmation) */
         .generic-modal .modal-content {
             max-width: 400px;
             text-align: center;
@@ -505,17 +611,71 @@
 <body>
 
 <div class="container">
-    <h1 id="mainTitle">Modern Job Tracker ✨</h1>
-
-    <div class="header-actions">
-        <button id="languageToggleBtn" class="btn">Ganti Bahasa: EN</button>
+    <div id="tabContent">
         
-        <button id="openNewJobModalBtn" class="btn" data-lang-key="btn_add_new_job">➕ Tambah Pekerjaan Baru</button>
-    </div>
+        <div id="mainTab" class="tab-pane active">
+            <h1 id="mainTitle">Modern Job Tracker ✨</h1>
 
-    <div id="jobList" class="job-timeline">
+            <div class="header-actions">
+                <button id="languageToggleBtn" class="btn">Ganti Bahasa: EN</button>
+                <button id="openNewJobModalBtn" class="btn" data-lang-key="btn_add_new_job">➕ Tambah Pekerjaan Baru</button>
+            </div>
+
+            <div id="jobList" class="job-timeline">
+                </div>
         </div>
+
+        <div id="settingsTab" class="tab-pane">
+            <h1 data-lang-key="tab_settings_title" style="margin-bottom: 20px;">Pengaturan</h1>
+
+            <div class="settings-section">
+                <h3 data-lang-key="settings_status_title">Opsi Status</h3>
+                <ul id="statusOptionsList" class="options-list">
+                    </ul>
+                <form id="addStatusForm" class="add-option-form">
+                    <input type="text" id="newStatusKey" placeholder="ID (cth: my_status_1)" required>
+                    <input type="text" id="newStatusName" placeholder="Nama Tampilan (cth: Disetujui)" required>
+                    <button type="submit" class="btn" data-lang-key="btn_add_job" style="background-color: var(--success-color);">Tambah</button>
+                </form>
+                <p style="font-size: 0.8em; color: var(--text-color); margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                    ⚠️ Opsi default seperti To Do, In Progress, Done tidak dapat dihapus. Opsi yang Anda tambahkan harus memiliki ID unik (cth: `status_disetujui`).
+                </p>
+            </div>
+
+            <div class="settings-section">
+                <h3 data-lang-key="settings_phase_title">Opsi Fase</h3>
+                <ul id="phaseOptionsList" class="options-list">
+                    </ul>
+                <form id="addPhaseForm" class="add-option-form">
+                    <input type="text" id="newPhaseKey" placeholder="ID (cth: my_phase_1)" required>
+                    <input type="text" id="newPhaseName" placeholder="Nama Tampilan (cth: Pra-produksi)" required>
+                    <button type="submit" class="btn" data-lang-key="btn_add_job" style="background-color: var(--success-color);">Tambah</button>
+                </form>
+                <p style="font-size: 0.8em; color: var(--text-color); margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                    ⚠️ Opsi default seperti Planning, Implementation, Testing tidak dapat dihapus. Opsi yang Anda tambahkan harus memiliki ID unik (cth: `phase_praproduksi`).
+                </p>
+            </div>
+
+            <div class="settings-section" style="text-align: right; background-color: white;">
+                 <button id="settingsSaveLangBtn" class="btn" style="background-color: var(--secondary-color);">Simpan Pengaturan Bahasa (Otomatis)</button>
+            </div>
+
+        </div>
+
+    </div>
 </div>
+
+<div class="bottom-bar">
+    <div id="tabMainButton" class="tab-button active" onclick="switchTab('mainTab')">
+        <span class="icon">🏠</span>
+        <span data-lang-key="tab_main_label">Utama</span>
+    </div>
+    <div id="tabSettingsButton" class="tab-button" onclick="switchTab('settingsTab')">
+        <span class="icon">⚙️</span>
+        <span data-lang-key="tab_settings_label">Pengaturan</span>
+    </div>
+</div>
+
 
 <div id="newJobModal" class="modal">
     <div class="modal-content">
@@ -528,34 +688,26 @@
                 <label for="newJobName" data-lang-key="label_job_name">Nama Pekerjaan:</label>
                 <input type="text" id="newJobName" required>
             </div>
-
-            <div class="form-group">
+             <div class="form-group">
                 <label for="newPic" data-lang-key="label_pic_initial">PIC Awal:</label>
                 <input type="text" id="newPic" required>
             </div>
-
             <div class="form-group">
                 <label for="newPhase" data-lang-key="label_phase_initial">Fase Awal:</label>
-                <select id="newPhase">
-                    </select>
+                <select id="newPhase" required></select>
             </div>
-
+            <div class="form-group">
+                <label for="newStatus" data-lang-key="label_status">Status:</label>
+                <select id="newStatus" required></select>
+            </div>
             <div class="form-group">
                 <label for="newTargetDate" data-lang-key="label_target_date">Tanggal Target:</label>
                 <input type="date" id="newTargetDate" required>
             </div>
-
-            <div class="form-group">
-                <label for="newStatus" data-lang-key="label_status">Status:</label>
-                <select id="newStatus">
-                    </select>
-            </div>
-
             <div class="form-group">
                 <label for="newNotes" data-lang-key="label_notes">Keterangan:</label>
-                <textarea id="newNotes"></textarea>
+                <textarea id="newNotes" rows="3"></textarea>
             </div>
-
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" data-modal="newJobModal" data-lang-key="btn_cancel">Batal</button>
                 <button type="submit" class="btn" data-lang-key="btn_add_job">Tambahkan Pekerjaan</button>
@@ -567,10 +719,10 @@
 <div id="updateJobModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="updateModalTitle" data-lang-key="modal_update_title">Update Status Pekerjaan</h2>
+            <h2 id="updateModalTitle" data-lang-key="modal_update_title">Update Status Baru</h2>
             <span class="close-btn" data-modal="updateJobModal">&times;</span>
         </div>
-        <form id="updateJobForm">
+        <form id="updateJobForm" data-job-id="" data-history-id="">
             <input type="hidden" id="jobIndexToUpdate">
             <input type="hidden" id="historyIndexToUpdate">
 
@@ -578,24 +730,19 @@
                 <label for="updatePic" data-lang-key="label_pic_new">PIC Baru:</label>
                 <input type="text" id="updatePic" required>
             </div>
-
             <div class="form-group">
                 <label for="updatePhase" data-lang-key="label_phase_new">Fase Baru:</label>
-                <select id="updatePhase" required>
-                    </select>
+                <select id="updatePhase" required></select>
             </div>
-
             <div class="form-group">
                 <label for="updateStatus" data-lang-key="label_status_new">Status Baru:</label>
-                <select id="updateStatus" required>
-                    </select>
+                <select id="updateStatus" required></select>
             </div>
-            
             <div class="form-group">
                 <label for="updateTargetDate" data-lang-key="label_target_date_new">Tanggal Target Baru:</label>
                 <input type="date" id="updateTargetDate" required>
             </div>
-
+            
             <div class="form-group" id="dateDoneGroup" style="display:none;">
                 <label for="updateDateDone" data-lang-key="label_date_done_new">Tanggal Selesai (Jika Done):</label>
                 <input type="date" id="updateDateDone">
@@ -603,7 +750,7 @@
 
             <div class="form-group">
                 <label for="updateNotes" data-lang-key="label_notes_new">Keterangan Baru:</label>
-                <textarea id="updateNotes" required></textarea>
+                <textarea id="updateNotes" rows="3"></textarea>
             </div>
 
             <div class="form-actions">
@@ -616,14 +763,14 @@
 
 <div id="confirmationModal" class="modal generic-modal">
     <div class="modal-content">
-        <div class="modal-header">
-             <h2 id="confirmModalTitle">Konfirmasi</h2>
-             <span class="close-btn" data-modal="confirmationModal">&times;</span>
+        <div class="modal-header" id="confirmModalHeader">
+            <span id="alertModalIcon">❓</span>
+            <h2 id="confirmModalTitle" data-lang-key="modal_confirm_delete_job">Konfirmasi</h2>
         </div>
-        <p id="confirmModalMessage" style="white-space: pre-wrap;"></p>
-        <div class="form-actions" style="justify-content: center; margin-top: 15px;">
+        <p id="confirmModalMessage"></p>
+        <div class="form-actions" style="justify-content: center;">
             <button type="button" class="btn btn-secondary" data-modal="confirmationModal" data-lang-key="btn_cancel">Batal</button>
-            <button type="button" class="btn" id="confirmActionBtn" data-lang-key="btn_delete_job">Hapus</button>
+            <button type="button" class="btn" id="confirmActionBtn" data-lang-key="btn_save">Simpan</button>
         </div>
     </div>
 </div>
@@ -632,44 +779,102 @@
     <div class="modal-content">
         <div class="modal-header" id="alertModalHeader">
             <span id="alertModalIcon">✅</span>
-             <h2 id="alertModalTitle">Sukses</h2>
-             <span class="close-btn" data-modal="alertModal">&times;</span>
+            <h2 id="alertModalTitle" data-lang-key="modal_alert_success_title">Aksi Berhasil</h2>
         </div>
-        <p id="alertModalMessage" style="white-space: pre-wrap;"></p>
+        <p id="alertModalMessage"></p>
         <div class="form-actions" style="justify-content: center; margin-top: 10px;">
-            <button type="button" class="btn" data-modal="alertModal" data-lang-key="btn_ok" style="background-color: var(--primary-color);">OK</button>
+            <button type="button" class="btn" data-modal="alertModal" data-lang-key="btn_ok">OK</button>
         </div>
     </div>
 </div>
 
+
 <script>
     // --- 1. DATA, KONFIGURASI, DAN HELPER GLOBAL ---
     
-    // !!! PERHATIAN PENTING !!!
-    // GANTI URL_DEPLOYMENT_ANDA_DI_SINI dengan URL Web App Apps Script yang sudah Anda deploy.
+    // !!! URL APPS SCRIPT ANDA DARI INPUT TERBARU !!!
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwviulMH14FEIyfLAlN4eII-NjyGWhj_0049_M_9hSOvfTc5JLI-e76z1Mec6v7pMeH/exec'; 
     
     let jobs = []; 
     let currentLang = localStorage.getItem('appLang') || 'id'; 
     
-    // Element Selector Helper (Didefinisikan paling awal)
+    // Element Selector Helper
     const getEl = (id) => document.getElementById(id);
     const getLang = () => TRANSLATIONS[currentLang];
     
     const jobList = getEl('jobList');
     const languageToggleBtn = getEl('languageToggleBtn');
+    
+    // Daftarkan event listener untuk tombol 'Tambah Pekerjaan Baru'
+    getEl('openNewJobModalBtn').addEventListener('click', () => {
+        updateSelectOptions(getEl('newPhase'), PHASE_OPTIONS, getEl('newPhase').value);
+        updateSelectOptions(getEl('newStatus'), STATUS_OPTIONS, getEl('newStatus').value);
+        
+        toggleModal('newJobModal', true);
+        getEl('newTargetDate').valueAsDate = new Date();
+    });
 
-    // Status/Phase Options 
-    const STATUS_OPTIONS = ['status_todo', 'status_inprogress', 'status_done', 'status_blocked', 'status_cancelled', 'status_selesai'];
-    const PHASE_OPTIONS = ['phase_planning', 'phase_implementation', 'phase_testing', 'phase_deployment', 'phase_revision'];
+    // Default Options (Untuk Fallback dan Validasi)
+    const DEFAULT_STATUS_OPTIONS = {
+        status_todo: "To Do", 
+        status_inprogress: "In Progress", 
+        status_done: "Done", 
+        status_blocked: "Blocked", 
+        status_cancelled: "Dibatalkan", 
+        status_selesai: "Selesai"
+    };
+    const DEFAULT_PHASE_OPTIONS = {
+        phase_planning: "Perencanaan", 
+        phase_implementation: "Implementasi", 
+        phase_testing: "Testing", 
+        phase_deployment: "Deployment", 
+        phase_revision: "Revisi"
+    };
 
-    // --- TRANSLATION DATA ---
+    let CUSTOM_STATUS_OPTIONS = {}; // Disimpan di localStorage
+    let CUSTOM_PHASE_OPTIONS = {};  // Disimpan di localStorage
+    
+    let STATUS_OPTIONS = []; // Array of keys
+    let PHASE_OPTIONS = [];  // Array of keys
+
+    // Fungsi untuk memuat pengaturan kustom dari localStorage
+    function loadSettings() {
+        const storedStatus = localStorage.getItem('customStatusOptions');
+        const storedPhase = localStorage.getItem('customPhaseOptions');
+        
+        CUSTOM_STATUS_OPTIONS = storedStatus ? JSON.parse(storedStatus) : {};
+        CUSTOM_PHASE_OPTIONS = storedPhase ? JSON.parse(storedPhase) : {};
+        
+        // Gabungkan semua opsi (default + custom) menjadi satu array kunci untuk digunakan di select
+        // Prioritas: Default (tetap di depan untuk konsistensi), diikuti oleh kustom
+        const defaultStatusKeys = Object.keys(DEFAULT_STATUS_OPTIONS);
+        const customStatusKeys = Object.keys(CUSTOM_STATUS_OPTIONS).filter(key => !defaultStatusKeys.includes(key));
+        STATUS_OPTIONS = defaultStatusKeys.concat(customStatusKeys);
+        
+        const defaultPhaseKeys = Object.keys(DEFAULT_PHASE_OPTIONS);
+        const customPhaseKeys = Object.keys(CUSTOM_PHASE_OPTIONS).filter(key => !defaultPhaseKeys.includes(key));
+        PHASE_OPTIONS = defaultPhaseKeys.concat(customPhaseKeys);
+    }
+    
+    // Fungsi untuk menyimpan pengaturan kustom ke localStorage
+    function saveSettings() {
+        localStorage.setItem('customStatusOptions', JSON.stringify(CUSTOM_STATUS_OPTIONS));
+        localStorage.setItem('customPhaseOptions', JSON.stringify(CUSTOM_PHASE_OPTIONS));
+        loadSettings(); // Reload global options
+    }
+    
+    // --- TRANSLATION DATA (Diperluas untuk Pengaturan Kustom) ---
     const TRANSLATIONS = {
         id: {
-            // UI Umum
+            // UI Umum & Tab
             app_title: "Modern Job Tracker ✨",
             main_title: "Modern Job Tracker ✨",
             lang_toggle_btn: "Ganti Bahasa: EN",
+            tab_main_label: "Utama",
+            tab_settings_label: "Pengaturan",
+            tab_settings_title: "Pengaturan Aplikasi",
+            settings_status_title: "Opsi Status",
+            settings_phase_title: "Opsi Fase",
             
             // Tombol Aksi
             btn_add_new_job: "➕ Tambah Pekerjaan Baru",
@@ -682,7 +887,7 @@
             btn_save: "Simpan",
             btn_ok: "OK",
             
-            // Status dan Fase (untuk badge dan select)
+            // Status dan Fase Default
             status_todo: "To Do",
             status_inprogress: "In Progress",
             status_done: "Done",
@@ -707,26 +912,22 @@
             text_status: "Status:",
             text_notes: "Keterangan:",
             
-            // Modal Tambah
+            // Modal Titles
             modal_new_job_title: "Tambah Pekerjaan Baru",
+            modal_update_title: "Update Status Baru",
+            modal_edit_title: "Edit Riwayat",
             label_job_name: "Nama Pekerjaan:",
             label_pic_initial: "PIC Awal:",
             label_phase_initial: "Fase Awal:",
             label_target_date: "Tanggal Target:",
             label_status: "Status:",
             label_notes: "Keterangan:",
-            
-            // Modal Update/Edit
-            modal_update_title: "Update Status Baru",
-            modal_edit_title: "Edit Riwayat",
             label_pic_new: "PIC Baru:", 
             label_phase_new: "Fase Baru:",
             label_status_new: "Status Baru:",
             label_target_date_new: "Tanggal Target Baru:",
             label_date_done_new: "Tanggal Selesai (Jika Done):",
             label_notes_new: "Keterangan Baru:",
-            
-            // Modal Generik Titles
             modal_confirm_delete_job: "Konfirmasi Hapus Pekerjaan",
             modal_confirm_delete_history: "Konfirmasi Hapus Riwayat",
             modal_alert_success_title: "Aksi Berhasil",
@@ -740,13 +941,22 @@
             alert_invalid_phase_status: "Fase saat ini tidak dapat diubah menjadi **Fase Revisi** kecuali statusnya Blocked atau Cancelled.",
             alert_history_is_initial: (name) => `Anda tidak dapat menghapus riwayat awal pekerjaan **${name}**.`,
             alert_history_is_last: (name) => `Anda tidak dapat menghapus riwayat terakhir/terbaru untuk pekerjaan **${name}**. Harap buat update baru terlebih dahulu.`,
-            alert_api_error: (msg) => `Terjadi kesalahan pada API Google Sheet:\n${msg}`
+            alert_api_error: (msg) => `Terjadi kesalahan pada API Google Sheet:\n${msg}`,
+            alert_custom_option_exists: (key) => `ID Opsi **${key}** sudah ada. Harap gunakan ID lain.`,
+            alert_custom_option_reserved: (key) => `ID Opsi **${key}** adalah ID default sistem dan tidak boleh diubah atau dihapus.`,
+            alert_custom_option_empty: "ID atau Nama Opsi tidak boleh kosong.",
+            alert_custom_option_success: (name, type) => `Opsi ${type} **${name}** berhasil ditambahkan.`
         },
         en: {
-            // UI Umum
+            // UI Umum & Tab
             app_title: "Modern Job Tracker ✨",
             main_title: "Modern Job Tracker ✨",
             lang_toggle_btn: "Switch Language: ID",
+            tab_main_label: "Main",
+            tab_settings_label: "Settings",
+            tab_settings_title: "Application Settings",
+            settings_status_title: "Status Options",
+            settings_phase_title: "Phase Options",
 
             // Tombol Aksi
             btn_add_new_job: "➕ Add New Job",
@@ -759,7 +969,7 @@
             btn_save: "Save",
             btn_ok: "OK",
 
-            // Status dan Fase
+            // Status dan Fase Default
             status_todo: "To Do",
             status_inprogress: "In Progress",
             status_done: "Done",
@@ -784,26 +994,22 @@
             text_status: "Status:",
             text_notes: "Notes:",
 
-            // Modal Tambah
+            // Modal Titles
             modal_new_job_title: "Add New Job",
+            modal_update_title: "Update New Status",
+            modal_edit_title: "Edit History",
             label_job_name: "Job Name:",
             label_pic_initial: "Initial PIC:",
             label_phase_initial: "Initial Phase:",
             label_target_date: "Target Date:",
             label_status: "Status:",
             label_notes: "Notes:",
-
-            // Modal Update/Edit
-            modal_update_title: "Update New Status",
-            modal_edit_title: "Edit History",
             label_pic_new: "New PIC:", 
             label_phase_new: "New Phase:",
             label_status_new: "New Status:",
             label_target_date_new: "New Target Date:",
             label_date_done_new: "Done Date (If Done):",
             label_notes_new: "New Notes:",
-            
-            // Modal Generik Titles
             modal_confirm_delete_job: "Confirm Delete Job",
             modal_confirm_delete_history: "Confirm Delete History",
             modal_alert_success_title: "Action Successful",
@@ -817,29 +1023,23 @@
             alert_invalid_phase_status: "The current phase cannot be changed to **Revision Phase** unless the status is Blocked or Cancelled.",
             alert_history_is_initial: (name) => `You cannot delete the initial history of job **${name}**.`,
             alert_history_is_last: (name) => `You cannot delete the last/latest history for job **${name}**. Please create a new update first.`,
-            alert_api_error: (msg) => `An error occurred in the Google Sheet API:\n${msg}`
+            alert_api_error: (msg) => `An error occurred in the Google Sheet API:\n${msg}`,
+            alert_custom_option_exists: (key) => `Option ID **${key}** already exists. Please use another ID.`,
+            alert_custom_option_reserved: (key) => `Option ID **${key}** is a default system ID and cannot be modified or deleted.`,
+            alert_custom_option_empty: "Option ID or Name cannot be empty.",
+            alert_custom_option_success: (name, type) => `${type} option **${name}** successfully added.`
         }
     };
-
+    
     // --- 2. FUNGSI UTILITY & CRUD (API INTEGRATION) ---
 
-    /**
-     * Mengirim permintaan ke Apps Script Web App.
-     * @param {string} action Aksi yang akan dilakukan (createJob, updateJob, dll.)
-     * @param {object} data Payload yang akan dikirim.
-     * @returns {Promise<object>} Objek hasil dari Apps Script.
-     */
     async function sendApiRequest(action, data) {
-        if (GAS_API_URL === 'GANTI_URL_DEPLOYMENT_ANDA_DI_SINI') {
-            showAlertDialog('modal_alert_error_title', 'URL API Google Apps Script belum diset. Harap deploy Apps Script dan ganti variabel GAS_API_URL.', true);
-            throw new Error('API URL Not Set');
-        }
         
         try {
             const response = await fetch(GAS_API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'text/plain;charset=utf-8' // Penting untuk Apps Script doPost
+                    'Content-Type': 'text/plain;charset=utf-8'
                 },
                 body: JSON.stringify({ action, ...data })
             });
@@ -862,10 +1062,9 @@
         }
     }
     
-    // FUNGSI PENGGANTI loadJobsFromLocalStorage
     async function fetchJobsFromSheet() {
         try {
-            const response = await fetch(GAS_API_URL); // GET request
+            const response = await fetch(GAS_API_URL);
             
             if (!response.ok) {
                 throw new Error(`HTTP Error: ${response.status}`);
@@ -877,15 +1076,12 @@
                 throw new Error(result.error);
             }
             
-            // Data yang dikembalikan sudah dalam format yang benar [{jobId, name, history:[...]}]
             jobs = result;
             
         } catch (error) {
             console.error('Failed to load jobs from Sheet:', error);
-            // Jika gagal, inisialisasi jobs sebagai array kosong
             jobs = []; 
         }
-        // Setelah load, render data
         renderJobs();
     }
     
@@ -896,21 +1092,19 @@
         if (dateInput instanceof Date) {
             dateObject = dateInput;
         } else if (typeof dateInput === 'string' && dateInput.split('-').length === 3) {
+            // Jika format YYYY-MM-DD (dari input date)
             if (dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
                  const parts = dateInput.split('-');
                  dateObject = new Date(parts[0], parts[1] - 1, parts[2]);
+            // Jika sudah format DD-MM-YYYY
             } else if (dateInput.match(/^\d{2}-\d{2}-\d{4}$/)) {
                  return dateInput;
             } else {
                  return dateInput;
             }
         } else {
-            const parts = dateInput.split('-');
-            if (parts.length === 3) {
-                 dateObject = new Date(parts[0], parts[1] - 1, parts[2]);
-            } else {
-                 return dateInput;
-            }
+            // Default fallback
+            return dateInput;
         }
         
         const day = String(dateObject.getDate()).padStart(2, '0');
@@ -938,7 +1132,7 @@
         return history;
     }
 
-
+    // Fungsi Modal
     function toggleModal(modalId, show) {
         const modal = getEl(modalId);
         if (show) {
@@ -961,8 +1155,6 @@
             }
         }
     }
-    
-    // FUNGSI MODAL GENERIK
     
     function showConfirmationModal(titleKey, message, onConfirm) {
         const lang = getLang();
@@ -1074,6 +1266,7 @@
         getEl('updateJobForm').setAttribute('data-job-id', job.jobId);
         getEl('updateJobForm').setAttribute('data-history-id', h.historyId);
         
+        // Perbarui opsi dan set nilai terpilih berdasarkan riwayat
         updateSelectOptions(updateStatusSelect, STATUS_OPTIONS, h.status);
         updateSelectOptions(updatePhaseSelect, PHASE_OPTIONS, h.phase);
 
@@ -1093,6 +1286,7 @@
             getEl('updateModalTitle').textContent = lang.modal_update_title;
             getEl('updateSubmitBtn').textContent = lang.btn_update_status;
             
+            // Jika ini update terbaru, bersihkan notes kecuali itu riwayat awal (hIndex === 0)
             if (historyIndex !== 0) {
                 getEl('updateNotes').value = ''; 
             } else {
@@ -1101,6 +1295,7 @@
 
             getEl('updatePhase').value = h.phase; 
             getEl('updateStatus').value = h.status;
+            // Target date harus diubah ke format YYYY-MM-DD untuk input type=date
             updateTargetDateInput.value = h.targetDate.split('-').reverse().join('-'); 
         } else {
             getEl('updateModalTitle').textContent = (historyIndex === 0) ? `${lang.modal_edit_title} Awal: ${job.name}` : lang.modal_edit_title;
@@ -1134,6 +1329,7 @@
             updateDateDoneInput.removeAttribute('required');
         }
 
+        // Listener untuk menampilkan input Date Done saat status diubah menjadi Done
         updateStatusSelect.onchange = function() {
             const selectedStatus = updateStatusSelect.value;
             const isSelectedDoneStatus = (selectedStatus === 'status_done' || selectedStatus === 'status_selesai');
@@ -1167,7 +1363,12 @@
             job.history = sortHistory(job.history); 
             
             const latestHistory = job.history[job.history.length - 1];
-            const latestStatusText = lang[latestHistory.status] || latestHistory.status;
+            
+            // Dapatkan teks terjemahan dari opsi default atau kustom
+            const latestStatusText = lang[latestHistory.status] 
+                || DEFAULT_STATUS_OPTIONS[latestHistory.status] 
+                || CUSTOM_STATUS_OPTIONS[latestHistory.status]
+                || latestHistory.status;
             
             const jobGroup = document.createElement('div');
             jobGroup.className = 'timeline-job-group';
@@ -1198,8 +1399,16 @@
             reversedHistory.forEach((h, hIndexReversed) => {
                 const hIndex = job.history.length - 1 - hIndexReversed; 
                 
-                const statusText = lang[h.status] || h.status;
-                const phaseText = lang[h.phase] || h.phase;
+                // Mendapatkan teks status dan fase dari TRANSLATIONS, DEFAULT, atau CUSTOM
+                const statusText = lang[h.status] 
+                    || DEFAULT_STATUS_OPTIONS[h.status] 
+                    || CUSTOM_STATUS_OPTIONS[h.status]
+                    || h.status;
+                const phaseText = lang[h.phase] 
+                    || DEFAULT_PHASE_OPTIONS[h.phase] 
+                    || CUSTOM_PHASE_OPTIONS[h.phase]
+                    || h.phase;
+                    
                 const isLatest = (hIndex === job.history.length - 1);
                 
                 const eventNode = document.createElement('div');
@@ -1210,8 +1419,8 @@
                 eventContent.className = 'event-content';
 
                 const dateDisplay = isLatest 
-                    ? `Update Terbaru: ${formatDate(h.date)}`
-                    : `Riwayat Update: ${formatDate(h.date)}`;
+                    ? `${lang.text_update_prefix} Terbaru: ${formatDate(h.date)}`
+                    : `${lang.text_update_prefix}: ${formatDate(h.date)}`;
 
                 let dateDoneHtml = h.dateDone 
                     ? `<div><strong>${lang.text_date_done}</strong> ${formatDate(h.dateDone)}</div>` 
@@ -1246,9 +1455,9 @@
 
     // --- 4. LOGIKA TAMBAH/UPDATE PEKERJAAN & EVENT LISTENERS UI ---
 
-    // LOGIKA TAMBAH PEKERJAAN BARU
     getEl('newJobForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const lang = getLang();
 
         const name = getEl('newJobName').value;
         const pic = getEl('newPic').value;
@@ -1281,7 +1490,6 @@
         }
     });
     
-    // LOGIKA UPDATE/EDIT PEKERJAAN
     getEl('updateJobForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const lang = getLang();
@@ -1326,19 +1534,18 @@
         let apiAction = '';
 
         if (isLatestHistory && getEl('updateSubmitBtn').textContent === lang.btn_update_status) {
+            // Ini adalah aksi "Update Status" (menambah riwayat baru)
             apiAction = 'updateJob'; 
-            // Untuk update Job, kita hanya perlu mengirim data riwayat baru
             dataToUpdate.name = job.name; 
             
-            successMessage = `Pekerjaan **${job.name}** berhasil diupdate dengan status **${lang[newStatus]}** dan Fase **${lang[newPhase]}**`;
+            const newStatusText = lang[newStatus] || CUSTOM_STATUS_OPTIONS[newStatus] || newStatus;
+            const newPhaseText = lang[newPhase] || CUSTOM_PHASE_OPTIONS[newPhase] || newPhase;
+
+            successMessage = `Pekerjaan **${job.name}** berhasil diupdate dengan status **${newStatusText}** dan Fase **${newPhaseText}**`;
         } else {
+            // Ini adalah aksi "Edit Riwayat"
             apiAction = 'editHistory'; 
-            // Untuk edit History, kita perlu mengirim historyId
             dataToUpdate.historyId = historyId;
-            // Data yang dikirim ke Apps Script untuk editHistory tidak memerlukan field date, tapi Apps Script akan mengambilnya dari sheet. 
-            // Karena kita hanya mengedit baris yang sudah ada, kita hanya perlu mengirim data kolom yang berubah.
-            // Di Apps Script, kita menggunakan historyId untuk menemukan baris dan memperbarui kolom 5-10.
-            
             successMessage = `Riwayat pada tanggal **${job.history[historyIndex].date}** untuk pekerjaan **${job.name}** berhasil diubah.`;
         }
 
@@ -1357,7 +1564,132 @@
         }
     });
 
-    // FUNGSI TRANSLASI
+    // --- 5. LOGIKA PENGATURAN KUSTOM (BARU) ---
+    
+    // Fungsi untuk merender daftar opsi status/fase di tab Pengaturan
+    function renderSettingsOptions() {
+        const lang = getLang();
+        const renderList = (elementId, isStatus) => {
+            const listEl = getEl(elementId);
+            listEl.innerHTML = '';
+            
+            const defaultOptions = isStatus ? DEFAULT_STATUS_OPTIONS : DEFAULT_PHASE_OPTIONS;
+            const customOptions = isStatus ? CUSTOM_STATUS_OPTIONS : CUSTOM_PHASE_OPTIONS;
+            
+            // Render Default Options (Non-deletable)
+            Object.keys(defaultOptions).forEach(key => {
+                const name = lang[key] || defaultOptions[key];
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<span class="option-name">${name} <span>(ID: ${key})</span></span>
+                                      <span style="color: #999;">(Default)</span>`;
+                listEl.appendChild(listItem);
+            });
+            
+            // Render Custom Options (Deletable)
+            Object.keys(customOptions).forEach(key => {
+                const name = customOptions[key];
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<span class="option-name">${name} <span>(ID: ${key})</span></span>
+                                      <button onclick="deleteCustomOption('${key}', ${isStatus})" class="btn btn-delete-option" data-lang-key="btn_delete_history">Hapus</button>`;
+                listEl.appendChild(listItem);
+            });
+        };
+        
+        renderList('statusOptionsList', true);
+        renderList('phaseOptionsList', false);
+    }
+    
+    // Fungsi untuk menambah opsi kustom
+    function addCustomOption(e, isStatus) {
+        e.preventDefault();
+        const lang = getLang();
+        
+        const form = e.target;
+        const keyInput = isStatus ? getEl('newStatusKey') : getEl('newPhaseKey');
+        const nameInput = isStatus ? getEl('newStatusName') : getEl('newPhaseName');
+
+        const key = keyInput.value.toLowerCase().trim().replace(/[^a-z0-9_]/g, ''); // Sanitasi key
+        const name = nameInput.value.trim();
+
+        const defaultOptions = isStatus ? DEFAULT_STATUS_OPTIONS : DEFAULT_PHASE_OPTIONS;
+        const customOptions = isStatus ? CUSTOM_STATUS_OPTIONS : CUSTOM_PHASE_OPTIONS;
+        const type = isStatus ? 'Status' : 'Fase';
+
+        if (!key || !name) {
+            showAlertDialog('modal_alert_error_title', lang.alert_custom_option_empty, true);
+            return;
+        }
+
+        if (defaultOptions[key] || customOptions[key]) {
+            showAlertDialog('modal_alert_error_title', lang.alert_custom_option_exists(key), true);
+            return;
+        }
+        
+        customOptions[key] = name;
+        saveSettings();
+        
+        // Tambahkan terjemahan untuk opsi kustom di kedua bahasa
+        TRANSLATIONS.id[key] = name;
+        TRANSLATIONS.en[key] = name; 
+        
+        renderSettingsOptions();
+        form.reset();
+        translateUI(); // Perbarui UI (termasuk select di modal)
+
+        showAlertDialog('modal_alert_success_title', lang.alert_custom_option_success(name, type));
+    }
+    
+    // Fungsi untuk menghapus opsi kustom
+    window.deleteCustomOption = function(key, isStatus) {
+        const lang = getLang();
+        const defaultOptions = isStatus ? DEFAULT_STATUS_OPTIONS : DEFAULT_PHASE_OPTIONS;
+        const customOptions = isStatus ? CUSTOM_STATUS_OPTIONS : CUSTOM_PHASE_OPTIONS;
+        
+        if (defaultOptions[key]) {
+            showAlertDialog('modal_alert_error_title', lang.alert_custom_option_reserved(key), true);
+            return;
+        }
+        
+        showConfirmationModal('modal_confirm_delete_history', `Apakah Anda yakin ingin menghapus opsi kustom **${customOptions[key]}** (ID: ${key})?`, () => {
+             delete customOptions[key];
+             delete TRANSLATIONS.id[key];
+             delete TRANSLATIONS.en[key];
+             
+             saveSettings();
+             renderSettingsOptions();
+             translateUI(); // Perbarui UI (termasuk select di modal)
+             showAlertDialog('modal_alert_success_title', `Opsi **${key}** berhasil dihapus.`);
+        });
+    }
+
+    getEl('addStatusForm').addEventListener('submit', (e) => addCustomOption(e, true));
+    getEl('addPhaseForm').addEventListener('submit', (e) => addCustomOption(e, false));
+    getEl('settingsSaveLangBtn').addEventListener('click', () => translateUI());
+
+
+    // --- 6. LOGIKA TAB DAN TRANSLASI ---
+    
+    // Fungsi untuk beralih tab
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        getEl(tabId).classList.add('active');
+        getEl('tab' + tabId.replace('Tab', 'Button')).classList.add('active');
+        
+        // Panggil renderSettingsOptions jika pindah ke tab pengaturan
+        if (tabId === 'settingsTab') {
+            renderSettingsOptions();
+        } else if (tabId === 'mainTab' && jobs.length === 0) {
+            // Muat ulang pekerjaan hanya jika belum dimuat dan di tab utama
+            fetchJobsFromSheet();
+        }
+    }
+    
     function translateUI() {
         const lang = getLang();
 
@@ -1370,9 +1702,12 @@
             const key = el.getAttribute('data-lang-key');
             if (lang[key] && typeof lang[key] === 'string') {
                 el.textContent = lang[key];
+            } else if (key === 'tab_settings_title') {
+                 el.textContent = lang[key]; // Khusus untuk h1
             }
         });
 
+        // Perbarui Select Options dengan opsi kustom baru
         updateSelectOptions(getEl('newStatus'), STATUS_OPTIONS, getEl('newStatus').value);
         updateSelectOptions(getEl('updateStatus'), STATUS_OPTIONS, getEl('updateStatus').value);
         updateSelectOptions(getEl('newPhase'), PHASE_OPTIONS, getEl('newPhase').value);
@@ -1380,9 +1715,11 @@
         
         getEl('confirmModalTitle').textContent = lang.modal_confirm_delete_job.split(' ')[0]; 
         getEl('alertModalTitle').textContent = lang.modal_alert_success_title.split(' ')[0]; 
-        getEl('confirmActionBtn').textContent = lang.btn_save; 
         
-        renderJobs();
+        // Atur ulang teks tombol konfirmasi (karena mungkin terubah saat modal terbuka)
+        getEl('confirmActionBtn').textContent = (currentLang === 'id' ? 'Simpan' : 'Save'); 
+        
+        renderJobs(); // Render ulang pekerjaan agar badge menggunakan terjemahan yang benar
     }
     
     function updateSelectOptions(selectElement, optionsArray, selectedValue) {
@@ -1393,13 +1730,21 @@
         optionsArray.forEach(key => {
             const option = document.createElement('option');
             option.value = key; 
-            option.textContent = lang[key];
+            
+            // Dapatkan nama tampilan dari terjemahan, default, atau kustom
+            option.textContent = lang[key] 
+                || DEFAULT_STATUS_OPTIONS[key] 
+                || CUSTOM_STATUS_OPTIONS[key]
+                || DEFAULT_PHASE_OPTIONS[key] 
+                || CUSTOM_PHASE_OPTIONS[key]
+                || key; // Fallback ke ID jika tidak ada
+                
             selectElement.appendChild(option);
         });
         
         let foundSelected = false;
         Array.from(selectElement.options).forEach(opt => {
-             if (opt.textContent === selectedValue || opt.value === selectedValue) {
+             if (opt.value === selectedValue) {
                 opt.selected = true;
                 foundSelected = true;
              }
@@ -1410,21 +1755,7 @@
         }
     }
 
-    // EVENT LISTENERS UI
-    getEl('openNewJobModalBtn').addEventListener('click', () => {
-        updateSelectOptions(getEl('newPhase'), PHASE_OPTIONS, getEl('newPhase').value);
-        updateSelectOptions(getEl('newStatus'), STATUS_OPTIONS, getEl('newStatus').value);
-        
-        toggleModal('newJobModal', true);
-        getEl('newTargetDate').valueAsDate = new Date();
-    });
-
-    languageToggleBtn.addEventListener('click', () => {
-        currentLang = (currentLang === 'id') ? 'en' : 'id';
-        localStorage.setItem('appLang', currentLang);
-        translateUI();
-    });
-
+    // EVENT LISTENERS UI (Penanganan Modal)
     document.querySelectorAll('.close-btn, .btn-secondary[data-modal], #alertModal .btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modalId = e.target.dataset.modal || e.target.closest('.modal').id;
@@ -1439,10 +1770,10 @@
     });
 
 
-    // --- 5. INISIALISASI ---
-    // Panggil fungsi baru untuk memuat dari Google Sheet
-    fetchJobsFromSheet(); 
-    translateUI(); 
+    // --- 7. INISIALISASI ---
+    loadSettings(); // 1. Muat pengaturan kustom
+    fetchJobsFromSheet(); // 2. Muat data pekerjaan
+    translateUI(); // 3. Perbarui UI dan Select Options
 </script>
 
 </body>
