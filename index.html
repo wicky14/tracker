@@ -330,16 +330,21 @@
         /* ======================================= */
         .bottom-bar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            bottom: 15px; /* Floating */
+            left: 15px; /* Floating */
+            right: 15px; /* Floating */
+            width: auto; /* Dihitung otomatis */
             height: var(--bottom-bar-height);
-            background-color: var(--bg-card);
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            /* background-color: var(--bg-card); */
+            background-color: rgba(255, 255, 255, 0.6); /* Opacity 60% */
+            backdrop-filter: blur(10px); /* Gaussian Blur */
+            -webkit-backdrop-filter: blur(10px); /* Safari Blur */
+            box-shadow: var(--shadow-lg); /* Shadow baru */
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 900;
+            border-radius: 12px; /* Rounded corners */
         }
 
         .tab-button {
@@ -479,6 +484,7 @@
         @media (max-width: 550px) {
             .modal-content {
                 max-width: 95%;
+                padding: 20px; /* Kurangi padding di HP */
                 margin: 20px 0;
                 overflow-y: auto;
             }
@@ -705,7 +711,7 @@
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" data-modal="newJobModal" data-lang-key="btn_cancel">Batal</button>
-                <button type="submit" class="btn" data-lang-key="btn_add_job">Tambahkan</button>
+                <button type="submit" class="btn" data-lang-key="btn_add_job">Tambahkan Pekerjaan</button>
             </div>
         </form>
     </div>
@@ -895,7 +901,7 @@
             btn_update_status: "Update Status",
             btn_edit_history: "📝 Edit Riwayat",
             btn_cancel: "Batal",
-            btn_add_job: "Tambahkan",
+            btn_add_job: "Tambahkan Pekerjaan",
             btn_save: "Simpan",
             btn_ok: "OK",
             
@@ -977,7 +983,7 @@
             btn_update_status: "Update Status",
             btn_edit_history: "📝 Edit History",
             btn_cancel: "Cancel",
-            btn_add_job: "Add",
+            btn_add_job: "Add Job",
             btn_save: "Save",
             btn_ok: "OK",
 
