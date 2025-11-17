@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="appTitle">Job Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title id="appTitle">Job Tracker</title> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ======================================= */
         /* 1. PALET WARNA & VARIABEL (PROFESSIONAL) */
@@ -614,9 +613,7 @@
     <div id="tabContent">
         
         <div id="mainTab" class="tab-pane active">
-            <h1 id="mainTitle">Modern Job Tracker ✨</h1>
-
-            <div class="header-actions">
+            <h1 id="mainTitle">Job Tracker</h1> <div class="header-actions">
                 <button id="languageToggleBtn" class="btn">Ganti Bahasa: EN</button>
                 <button id="openNewJobModalBtn" class="btn" data-lang-key="btn_add_new_job">➕ Tambah Pekerjaan Baru</button>
             </div>
@@ -633,12 +630,11 @@
                 <ul id="statusOptionsList" class="options-list">
                     </ul>
                 <form id="addStatusForm" class="add-option-form">
-                    <input type="text" id="newStatusKey" placeholder="ID (cth: my_status_1)" required>
                     <input type="text" id="newStatusName" placeholder="Nama Tampilan (cth: Disetujui)" required>
                     <button type="submit" class="btn" data-lang-key="btn_add_job" style="background-color: var(--success-color);">Tambah</button>
                 </form>
                 <p style="font-size: 0.8em; color: var(--text-color); margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                    ⚠️ Opsi default seperti To Do, In Progress, Done tidak dapat dihapus. Opsi yang Anda tambahkan harus memiliki ID unik (cth: `status_disetujui`).
+                    ⚠️ Opsi default seperti To Do, In Progress, Done tidak dapat dihapus. ID unik akan dibuat secara otomatis berdasarkan nama tampilan.
                 </p>
             </div>
 
@@ -647,12 +643,11 @@
                 <ul id="phaseOptionsList" class="options-list">
                     </ul>
                 <form id="addPhaseForm" class="add-option-form">
-                    <input type="text" id="newPhaseKey" placeholder="ID (cth: my_phase_1)" required>
                     <input type="text" id="newPhaseName" placeholder="Nama Tampilan (cth: Pra-produksi)" required>
                     <button type="submit" class="btn" data-lang-key="btn_add_job" style="background-color: var(--success-color);">Tambah</button>
                 </form>
                 <p style="font-size: 0.8em; color: var(--text-color); margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                    ⚠️ Opsi default seperti Planning, Implementation, Testing tidak dapat dihapus. Opsi yang Anda tambahkan harus memiliki ID unik (cth: `phase_praproduksi`).
+                    ⚠️ Opsi default seperti Planning, Implementation, Testing tidak dapat dihapus. ID unik akan dibuat secara otomatis berdasarkan nama tampilan.
                 </p>
             </div>
 
@@ -837,6 +832,20 @@
     let STATUS_OPTIONS = []; // Array of keys
     let PHASE_OPTIONS = [];  // Array of keys
 
+    // Fungsi untuk menggabungkan opsi kustom yang dimuat ke objek TRANSLATIONS
+    function mergeCustomTranslations() {
+        // Merge custom status
+        Object.keys(CUSTOM_STATUS_OPTIONS).forEach(key => {
+            TRANSLATIONS.id[key] = CUSTOM_STATUS_OPTIONS[key];
+            TRANSLATIONS.en[key] = CUSTOM_STATUS_OPTIONS[key]; 
+        });
+        // Merge custom phase
+        Object.keys(CUSTOM_PHASE_OPTIONS).forEach(key => {
+            TRANSLATIONS.id[key] = CUSTOM_PHASE_OPTIONS[key];
+            TRANSLATIONS.en[key] = CUSTOM_PHASE_OPTIONS[key];
+        });
+    }
+
     // Fungsi untuk memuat pengaturan kustom dari localStorage
     function loadSettings() {
         const storedStatus = localStorage.getItem('customStatusOptions');
@@ -844,6 +853,9 @@
         
         CUSTOM_STATUS_OPTIONS = storedStatus ? JSON.parse(storedStatus) : {};
         CUSTOM_PHASE_OPTIONS = storedPhase ? JSON.parse(storedPhase) : {};
+        
+        // --- PERBAIKAN PENTING: Panggil mergeCustomTranslations di sini ---
+        mergeCustomTranslations(); 
         
         // Gabungkan semua opsi (default + custom) menjadi satu array kunci untuk digunakan di select
         // Prioritas: Default (tetap di depan untuk konsistensi), diikuti oleh kustom
@@ -860,15 +872,15 @@
     function saveSettings() {
         localStorage.setItem('customStatusOptions', JSON.stringify(CUSTOM_STATUS_OPTIONS));
         localStorage.setItem('customPhaseOptions', JSON.stringify(CUSTOM_PHASE_OPTIONS));
-        loadSettings(); // Reload global options
+        loadSettings(); // Reload global options (termasuk merge translations)
     }
     
     // --- TRANSLATION DATA (Diperluas untuk Pengaturan Kustom) ---
     const TRANSLATIONS = {
         id: {
             // UI Umum & Tab
-            app_title: "Modern Job Tracker ✨",
-            main_title: "Modern Job Tracker ✨",
+            app_title: "Job Tracker", // DIPERBAIKI
+            main_title: "Job Tracker", // DIPERBAIKI
             lang_toggle_btn: "Ganti Bahasa: EN",
             tab_main_label: "Utama",
             tab_settings_label: "Pengaturan",
@@ -944,13 +956,13 @@
             alert_api_error: (msg) => `Terjadi kesalahan pada API Google Sheet:\n${msg}`,
             alert_custom_option_exists: (key) => `ID Opsi **${key}** sudah ada. Harap gunakan ID lain.`,
             alert_custom_option_reserved: (key) => `ID Opsi **${key}** adalah ID default sistem dan tidak boleh diubah atau dihapus.`,
-            alert_custom_option_empty: "ID atau Nama Opsi tidak boleh kosong.",
+            alert_custom_option_empty: "Nama Opsi tidak boleh kosong.", // Diperbarui
             alert_custom_option_success: (name, type) => `Opsi ${type} **${name}** berhasil ditambahkan.`
         },
         en: {
             // UI Umum & Tab
-            app_title: "Modern Job Tracker ✨",
-            main_title: "Modern Job Tracker ✨",
+            app_title: "Job Tracker", // DIPERBAIKI
+            main_title: "Job Tracker", // DIPERBAIKI
             lang_toggle_btn: "Switch Language: ID",
             tab_main_label: "Main",
             tab_settings_label: "Settings",
@@ -1026,7 +1038,7 @@
             alert_api_error: (msg) => `An error occurred in the Google Sheet API:\n${msg}`,
             alert_custom_option_exists: (key) => `Option ID **${key}** already exists. Please use another ID.`,
             alert_custom_option_reserved: (key) => `Option ID **${key}** is a default system ID and cannot be modified or deleted.`,
-            alert_custom_option_empty: "Option ID or Name cannot be empty.",
+            alert_custom_option_empty: "Option Name cannot be empty.", // Diperbarui
             alert_custom_option_success: (name, type) => `${type} option **${name}** successfully added.`
         }
     };
@@ -1571,6 +1583,8 @@
         const lang = getLang();
         const renderList = (elementId, isStatus) => {
             const listEl = getEl(elementId);
+            if (!listEl) return; // Safety check
+            
             listEl.innerHTML = '';
             
             const defaultOptions = isStatus ? DEFAULT_STATUS_OPTIONS : DEFAULT_PHASE_OPTIONS;
@@ -1578,7 +1592,8 @@
             
             // Render Default Options (Non-deletable)
             Object.keys(defaultOptions).forEach(key => {
-                const name = lang[key] || defaultOptions[key];
+                // Menggunakan terjemahan jika tersedia, jika tidak menggunakan nilai default
+                const name = lang[key] || defaultOptions[key]; 
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `<span class="option-name">${name} <span>(ID: ${key})</span></span>
                                       <span style="color: #999;">(Default)</span>`;
@@ -1605,36 +1620,64 @@
         const lang = getLang();
         
         const form = e.target;
-        const keyInput = isStatus ? getEl('newStatusKey') : getEl('newPhaseKey');
         const nameInput = isStatus ? getEl('newStatusName') : getEl('newPhaseName');
 
-        const key = keyInput.value.toLowerCase().trim().replace(/[^a-z0-9_]/g, ''); // Sanitasi key
         const name = nameInput.value.trim();
-
+        
         const defaultOptions = isStatus ? DEFAULT_STATUS_OPTIONS : DEFAULT_PHASE_OPTIONS;
         const customOptions = isStatus ? CUSTOM_STATUS_OPTIONS : CUSTOM_PHASE_OPTIONS;
         const type = isStatus ? 'Status' : 'Fase';
 
-        if (!key || !name) {
+        if (!name) {
             showAlertDialog('modal_alert_error_title', lang.alert_custom_option_empty, true);
             return;
         }
+        
+        // 1. Generate Key Automatically
+        let sanitizedName = name.toLowerCase()
+                                .trim()
+                                .replace(/\s+/g, '_')
+                                .replace(/[^a-z0-9_]/g, '');
+        
+        const prefix = isStatus ? 'status_' : 'phase_';
+        let baseKey = `${prefix}${sanitizedName}`;
+        let key = baseKey;
+        let counter = 1;
+        
+        // Check against ALL existing keys (Default Status + Custom Status + Default Phase + Custom Phase)
+        const allExistingKeys = { 
+            ...DEFAULT_STATUS_OPTIONS, 
+            ...CUSTOM_STATUS_OPTIONS,
+            ...DEFAULT_PHASE_OPTIONS, 
+            ...CUSTOM_PHASE_OPTIONS
+        };
 
-        if (defaultOptions[key] || customOptions[key]) {
-            showAlertDialog('modal_alert_error_title', lang.alert_custom_option_exists(key), true);
-            return;
+        // Ensure uniqueness
+        while (allExistingKeys[key] || TRANSLATIONS.id[key]) {
+            key = `${baseKey}_${counter}`;
+            counter++;
+            if (counter > 100) { // Safety break
+                console.error("Key generation loop limit reached.");
+                return;
+            }
         }
         
+        if (!key.startsWith(prefix)) { // Ensure prefix consistency (shouldn't happen with current logic, but for safety)
+             key = prefix + key;
+        }
+
+        // 2. Add to custom options
         customOptions[key] = name;
-        saveSettings();
         
-        // Tambahkan terjemahan untuk opsi kustom di kedua bahasa
+        // 3. Add to translations
         TRANSLATIONS.id[key] = name;
         TRANSLATIONS.en[key] = name; 
         
+        saveSettings(); // Menyimpan CUSTOM_OPTIONS dan memanggil loadSettings (termasuk merge translations)
+        
         renderSettingsOptions();
         form.reset();
-        translateUI(); // Perbarui UI (termasuk select di modal)
+        translateUI(); 
 
         showAlertDialog('modal_alert_success_title', lang.alert_custom_option_success(name, type));
     }
@@ -1655,7 +1698,7 @@
              delete TRANSLATIONS.id[key];
              delete TRANSLATIONS.en[key];
              
-             saveSettings();
+             saveSettings(); // Menyimpan CUSTOM_OPTIONS yang telah dihapus
              renderSettingsOptions();
              translateUI(); // Perbarui UI (termasuk select di modal)
              showAlertDialog('modal_alert_success_title', `Opsi **${key}** berhasil dihapus.`);
@@ -1683,7 +1726,8 @@
         
         // Panggil renderSettingsOptions jika pindah ke tab pengaturan
         if (tabId === 'settingsTab') {
-            renderSettingsOptions();
+            // Memastikan opsi diperbarui saat navigasi
+            renderSettingsOptions(); 
         } else if (tabId === 'mainTab' && jobs.length === 0) {
             // Muat ulang pekerjaan hanya jika belum dimuat dan di tab utama
             fetchJobsFromSheet();
@@ -1720,6 +1764,10 @@
         getEl('confirmActionBtn').textContent = (currentLang === 'id' ? 'Simpan' : 'Save'); 
         
         renderJobs(); // Render ulang pekerjaan agar badge menggunakan terjemahan yang benar
+        
+        // *** PERBAIKAN PENTING: Panggil renderSettingsOptions di sini
+        // agar opsi default/kustom selalu muncul saat memuat awal dan ganti bahasa. ***
+        renderSettingsOptions(); 
     }
     
     function updateSelectOptions(selectElement, optionsArray, selectedValue) {
@@ -1771,7 +1819,7 @@
 
 
     // --- 7. INISIALISASI ---
-    loadSettings(); // 1. Muat pengaturan kustom
+    loadSettings(); // 1. Muat pengaturan kustom (SEKARANG MEMPERBARUI TRANSLATIONS)
     
     // 2. Event Listener untuk Tombol Ganti Bahasa (FIXED)
     languageToggleBtn.addEventListener('click', () => {
@@ -1780,7 +1828,7 @@
         translateUI();
     });
     
-    // 3. Muat data pekerjaan dan perbarui UI
+    // 3. Muat data pekerjaan dan perbarui UI (translateUI() akan dipanggil di sini)
     fetchJobsFromSheet(); 
     translateUI(); 
 
