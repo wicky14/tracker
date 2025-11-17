@@ -2,242 +2,1448 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Project Tracker - Google Sheets DB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="appTitle">Job Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            background-color: #f4f7f6;
+        /* ======================================= */
+        /* 1. PALET WARNA & VARIABEL BARU (PROFESSIONAL) */
+        /* ======================================= */
+        :root {
+            --primary-color: #1e40af; /* Deep Corporate Blue */
+            --secondary-color: #374151; /* Dark Grey/Navy for text */
+            --accent-color: #007bff; /* Standard Blue for primary action */
+            --text-color: #4b5563; /* Subtle dark text */
+            --light-text-color: #ffffff;
+            --border-color: #e5e7eb; /* Light border */
+            --bg-light: #f9fafb; /* Very light background */
+            --bg-card: #ffffff;
+            --success-color: #10b981; /* Corporate Teal Green */
+            --error-color: #ef4444; /* Subtle Red */
+            --warning-color: #f59e0b; /* Amber/Orange for warning */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        h1, h2 { 
-            color: #333; 
+
+        /* ======================================= */
+        /* 2. BASE STYLES & CONTAINER */
+        /* ======================================= */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 15px; 
+            background-color: var(--bg-light);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
         }
-        form { 
-            margin-bottom: 30px; 
-            padding: 25px; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        
+        /* Padding lebih besar untuk desktop */
+        @media (min-width: 900px) {
+             body {
+                 padding: 30px;
+             }
         }
-        input, select { 
-            margin-bottom: 15px; 
-            padding: 10px; 
-            width: 100%; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 10px; /* Lebih profesional */
+            box-shadow: var(--shadow-lg);
+            padding: 25px; /* Sedikit lebih besar */
         }
-        button { 
-            padding: 12px 20px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            cursor: pointer; 
-            border-radius: 4px; 
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 35px;
+            font-weight: 700;
+            font-size: 2.2em;
+        }
+
+        /* ======================================= */
+        /* 3. HEADER & BUTTONS */
+        /* ======================================= */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px; /* Lebih kecil */
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap; 
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8; /* Slightly darker primary */
+            transform: translateY(-1px);
+            box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Language Toggle Button Styling */
+        #languageToggleBtn {
+            background-color: var(--secondary-color); 
+            padding: 8px 15px;
+            font-size: 0.8em;
+            box-shadow: none;
+        }
+        #languageToggleBtn:hover {
+            background-color: #4b5563;
+        }
+        
+        /* Responsif Header Actions */
+        @media (max-width: 600px) {
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-actions .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+        }
+
+
+        /* --- STYLING TIMELINE --- */
+
+        /* Sembunyikan semua elemen tabel (tetap sama) */
+        table, thead, tbody, th, td, tr, .table-responsive, #jobTable {
+            display: none; 
+        }
+
+        /* Timeline Container */
+        .job-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Jarak antar Job Group sedikit lebih renggang */
+            margin-top: 15px;
+        }
+
+        /* Individual Job Group - Kartu Utama */
+        .timeline-job-group {
+            background-color: var(--bg-card);
+            border-radius: 8px; /* Lebih profesional */
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .timeline-job-group:hover {
+             transform: translateY(-1px);
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Job Summary Header (Latest Status) */
+        .job-summary-header {
+            padding: 18px 25px; /* Padding lebih besar */
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .job-summary-header strong {
+            flex-grow: 1;
+            margin-right: 15px;
+            font-size: 1.15em;
+            font-weight: 700;
+        }
+
+        .job-summary-header .summary-status {
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .job-summary-header .btn {
+            /* Button style for Delete and Update in header */
+            padding: 5px 10px;
+            font-size: 0.7em;
+            background-color: var(--error-color); 
+            box-shadow: none;
+            border-radius: 6px;
+        }
+        
+        /* Responsif Job Summary Header */
+        @media (max-width: 500px) {
+            .job-summary-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .job-summary-header .summary-status {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            .job-summary-header strong {
+                font-size: 1.2em;
+            }
+        }
+
+        .timeline-events {
+            position: relative;
+            padding: 20px 15px 10px 45px; 
+        }
+
+        /* Garis Timeline Vertikal */
+        .timeline-events::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background-color: var(--border-color);
+        }
+
+        /* Event Node */
+        .timeline-event {
+            position: relative;
+            padding: 0 0 30px 30px; /* Sedikit lebih renggang */
+        }
+
+        /* Dot Marker */
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 17px; 
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            z-index: 10;
+            border: 2px solid var(--bg-card); 
             transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        /* Event Content - Kartu Riwayat */
+        .event-content {
+            background-color: var(--bg-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color); /* Garis tipis */
+            box-shadow: var(--shadow-sm);
         }
-        #message {
+
+        .event-date {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            display: block;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .event-details div {
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+
+        .event-details strong {
+            color: var(--primary-color);
+            margin-right: 5px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .event-details .notes {
             margin-top: 10px;
-            font-weight: bold;
+            padding-top: 8px;
+            border-top: 1px dotted #ccc;
+            font-style: italic;
+            color: var(--text-color);
+            font-size: 0.9em;
         }
-        table { 
+
+        .event-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            flex-wrap: wrap; 
+        }
+
+        .event-actions .btn {
+            padding: 6px 12px;
+            font-size: 0.75em;
+            box-shadow: none;
+            border-radius: 6px;
+        }
+        
+        /* Status coloring for the dot */
+        .timeline-event[data-status-key="status_done"]::before,
+        .timeline-event[data-status-key="status_selesai"]::before {
+            background-color: var(--success-color); 
+        }
+
+        .timeline-event[data-status-key="status_blocked"]::before {
+            background-color: var(--error-color); 
+        }
+
+        .timeline-event[data-status-key="status_inprogress"]::before {
+            background-color: var(--warning-color); 
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px; /* Lebih kotak, lebih profesional */
+            font-size: 0.7em;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        /* Definisi warna badge */
+        .status-badge.to-do { background-color: #6b7280; } /* Abu-abu sedang */
+        .status-badge.in-progress { background-color: var(--warning-color); color: var(--secondary-color); }
+        .status-badge.done, .status-badge.selesai, .status-badge.completed { background-color: var(--success-color); }
+        .status-badge.blocked { background-color: var(--error-color); }
+        .status-badge.cancelled, .status-badge.dibatalkan { background-color: #4b5563; }
+        /* Fase Badges */
+        .status-badge.perencanaan, .status-badge.planning { background-color: #1e40af; }
+        .status-badge.implementasi, .status-badge.implementation { background-color: #06b6d4; }
+        .status-badge.testing { background-color: #6366f1; }
+        .status-badge.deployment { background-color: #f97316; }
+        .status-badge.revisi, .status-badge.revision { background-color: #fcd34d; color: var(--secondary-color); }
+
+
+        /* ======================================= */
+        /* 4. MODAL STYLING (Dioptimalkan untuk Mobile) */
+        /* ======================================= */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Lebih gelap sedikit */
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal.is-visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            padding: 30px; /* Lebih banyak padding */
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            max-width: 550px; 
+            position: relative;
+            animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
         }
-        th, td { 
-            border: 1px solid #e0e0e0; 
-            padding: 10px; 
-            text-align: left; 
-            vertical-align: top; /* Penting untuk rowspan */
+        
+        /* Di Mobile, buat modal lebih tinggi */
+        @media (max-width: 550px) {
+            .modal-content {
+                max-width: 95%;
+                margin: 20px 0;
+                overflow-y: auto;
+            }
         }
-        th { 
-            background-color: #e9ecef; 
-            color: #495057;
-            font-weight: bold;
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color); /* Border lebih tipis */
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            color: var(--secondary-color);
+            font-size: 30px;
+            font-weight: 300; /* Lebih tipis */
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1; 
+        }
+        
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.95em;
+        }
+
+        input[type="text"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 1px var(--accent-color);
+        }
+        
+        input[readonly] {
+            background-color: var(--bg-light); 
+            cursor: default;
+        }
+
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280; /* Gray for secondary action */
+            color: white;
+        }
+        
+        /* Generic Modal Specific Styles (Alert/Confirmation) */
+        .generic-modal .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .generic-modal .modal-header {
+             justify-content: center;
+             margin-bottom: 10px;
+        }
+        
+        .generic-modal .modal-header h2 {
+            font-size: 1.3em;
+        }
+        
+        #alertModalIcon {
+            font-size: 2.2em;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+        
+        #alertModalHeader {
+             border-bottom: none; 
+        }
+
+        #confirmModalMessage, #alertModalMessage {
+            font-size: 1em;
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+        
+        #confirmActionBtn {
+            background-color: var(--error-color);
+        }
+        
+        #confirmModalMessage strong {
+            font-weight: 700;
+            color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
 
-    <h1>🚀 Project Tracker App</h1>
-    
-    <form id="projectForm">
-        <h2>Tambahkan Fase/Task Baru</h2>
-        <input type="number" id="no" name="no" placeholder="No. Tugas (misal: 1)" required>
-        <input type="text" id="task" name="task" placeholder="Nama Tugas Utama (misal: Periode Closing Akunting)" required>
-        <input type="text" id="phase" name="phase" placeholder="Phase/Langkah (misal: Development/Revisi)" required>
-        <input type="text" id="pic" name="pic" placeholder="Penanggung Jawab (PIC)" required>
-        <input type="number" id="chk" name="chk" placeholder="CHK" required>
-        <label for="targetDate">Target Date:</label>
-        <input type="date" id="targetDate" name="targetDate" required>
-        <label for="completedDate">Completed Date:</label>
-        <input type="date" id="completedDate" name="completedDate">
-        <select id="status" name="status" required>
-            <option value="">Pilih Status</option>
-            <option value="Not Started">Belum Dimulai</option>
-            <option value="In Progress">Sedang Berjalan</option>
-            <option value="Completed">Completed</option>
-            <option value="Pending">Pending</option>
-        </select>
-        <input type="text" id="keterangan" name="keterangan" placeholder="Keterangan / Catatan" required>
+<div class="container">
+    <h1 id="mainTitle">Modern Job Tracker ✨</h1>
 
-        <button type="submit">Tambah Phase</button>
-        <p id="message"></p>
-    </form>
-    
-    <hr>
-
-    <h2>📋 Daftar Proyek dan Phase</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Task</th>
-                <th>Phase</th>
-                <th>PIC</th>
-                <th>CHK</th>
-                <th>Target Date</th>
-                <th>Completed Date</th>
-                <th>Status</th>
-                <th>Keterangan</th>
-            </tr>
-        </thead>
-        <tbody id="projectList">
-            <tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>
-        </tbody>
-    </table>
-
-    <script>
-        // PASTIKAN ANDA MENGGANTI INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPN3VrDJyUq9PTi8MMCHKTJKXXnuWRbpjjSQP9k6d_bkbQBSsY-_g6uk3KG69tkfH9/exec"; 
+    <div class="header-actions">
+        <button id="languageToggleBtn" class="btn">Ganti Bahasa: EN</button>
         
-        // FUNGSI UNTUK MENGAMBIL DATA PROYEK DENGAN GROUPING
-        async function fetchProjects() {
-            const listBody = document.getElementById('projectList');
-            listBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>';
+        <button id="openNewJobModalBtn" class="btn" data-lang-key="btn_add_new_job">➕ Tambah Pekerjaan Baru</button>
+    </div>
+
+    <div id="jobList" class="job-timeline">
+        </div>
+</div>
+
+<div id="newJobModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 data-lang-key="modal_new_job_title">Tambah Pekerjaan Baru</h2>
+            <span class="close-btn" data-modal="newJobModal">&times;</span>
+        </div>
+        <form id="newJobForm">
+            <div class="form-group">
+                <label for="newJobName" data-lang-key="label_job_name">Nama Pekerjaan:</label>
+                <input type="text" id="newJobName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="newPic" data-lang-key="label_pic_initial">PIC Awal:</label>
+                <input type="text" id="newPic" required>
+            </div>
+
+            <div class="form-group">
+                <label for="newPhase" data-lang-key="label_phase_initial">Fase Awal:</label>
+                <select id="newPhase">
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newTargetDate" data-lang-key="label_target_date">Tanggal Target:</label>
+                <input type="date" id="newTargetDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="newStatus" data-lang-key="label_status">Status:</label>
+                <select id="newStatus">
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newNotes" data-lang-key="label_notes">Keterangan:</label>
+                <textarea id="newNotes"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" data-modal="newJobModal" data-lang-key="btn_cancel">Batal</button>
+                <button type="submit" class="btn" data-lang-key="btn_add_job">Tambahkan Pekerjaan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="updateJobModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="updateModalTitle" data-lang-key="modal_update_title">Update Status Pekerjaan</h2>
+            <span class="close-btn" data-modal="updateJobModal">&times;</span>
+        </div>
+        <form id="updateJobForm">
+            <input type="hidden" id="jobIndexToUpdate">
+            <input type="hidden" id="historyIndexToUpdate">
+
+            <div class="form-group">
+                <label for="updatePic" data-lang-key="label_pic_new">PIC Baru:</label>
+                <input type="text" id="updatePic" required>
+            </div>
+
+            <div class="form-group">
+                <label for="updatePhase" data-lang-key="label_phase_new">Fase Baru:</label>
+                <select id="updatePhase" required>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="updateStatus" data-lang-key="label_status_new">Status Baru:</label>
+                <select id="updateStatus" required>
+                    </select>
+            </div>
             
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const result = await response.json();
-                
-                listBody.innerHTML = ''; // Kosongkan tabel
+            <div class="form-group">
+                <label for="updateTargetDate" data-lang-key="label_target_date_new">Tanggal Target Baru:</label>
+                <input type="date" id="updateTargetDate" required>
+            </div>
 
-                if (result.result === 'success' && result.data && result.data.length > 0) {
-                    
-                    // 1. Mengelompokkan data berdasarkan No. dan Task
-                    const groupedProjects = result.data.reduce((acc, currentPhase) => {
-                        // Gabungkan No dan Task menjadi satu kunci unik
-                        const key = currentPhase.No + "|" + currentPhase.Task;
-                        if (!acc[key]) {
-                            acc[key] = {
-                                No: currentPhase.No,
-                                Task: currentPhase.Task,
-                                Phases: []
-                            };
-                        }
-                        acc[key].Phases.push(currentPhase);
-                        return acc;
-                    }, {});
+            <div class="form-group" id="dateDoneGroup" style="display:none;">
+                <label for="updateDateDone" data-lang-key="label_date_done_new">Tanggal Selesai (Jika Done):</label>
+                <input type="date" id="updateDateDone">
+            </div>
 
-                    // 2. Menampilkan data yang sudah dikelompokkan
-                    Object.values(groupedProjects).forEach(project => {
-                        let firstRow = true;
-                        const totalPhases = project.Phases.length;
+            <div class="form-group">
+                <label for="updateNotes" data-lang-key="label_notes_new">Keterangan Baru:</label>
+                <textarea id="updateNotes" required></textarea>
+            </div>
 
-                        project.Phases.forEach(phase => {
-                            const row = listBody.insertRow();
-                            
-                            // Baris Pertama (Header Proyek) - Menggunakan rowspan
-                            if (firstRow) {
-                                const cellNo = row.insertCell(0);
-                                cellNo.textContent = project.No; 
-                                cellNo.rowSpan = totalPhases;
-                                cellNo.style.backgroundColor = '#f8f9fa'; // Warna latar belakang untuk header grup
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" data-modal="updateJobModal" data-lang-key="btn_cancel">Batal</button>
+                <button type="submit" class="btn" id="updateSubmitBtn" data-lang-key="btn_update_status">Update Status</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-                                const cellTask = row.insertCell(1);
-                                cellTask.textContent = project.Task; 
-                                cellTask.rowSpan = totalPhases;
-                                cellTask.style.backgroundColor = '#f8f9fa';
+<div id="confirmationModal" class="modal generic-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+             <h2 id="confirmModalTitle">Konfirmasi</h2>
+             <span class="close-btn" data-modal="confirmationModal">&times;</span>
+        </div>
+        <p id="confirmModalMessage" style="white-space: pre-wrap;"></p>
+        <div class="form-actions" style="justify-content: center; margin-top: 15px;">
+            <button type="button" class="btn btn-secondary" data-modal="confirmationModal" data-lang-key="btn_cancel">Batal</button>
+            <button type="button" class="btn" id="confirmActionBtn" data-lang-key="btn_delete_job">Hapus</button>
+        </div>
+    </div>
+</div>
 
-                                firstRow = false;
-                            } 
-                            
-                            // Kolom Detail (Phase) - Mulai dari index ke-2
-                            row.insertCell(row.cells.length).textContent = phase.Phase || '';           // Phase
-                            row.insertCell(row.cells.length).textContent = phase.PIC || '';            // PIC
-                            row.insertCell(row.cells.length).textContent = phase.HK || '';            // HK
-                            row.insertCell(row.cells.length).textContent = phase.TargetDate ? new Date(phase.TargetDate).toLocaleDateString() : '';     // Target Date (Format tanggal)
-                            row.insertCell(row.cells.length).textContent = phase.CompletedDate ? new Date(phase.CompletedDate).toLocaleDateString() : '';  // Completed Date (Format tanggal)
-                            row.insertCell(row.cells.length).textContent = phase.Status || '';         // Status
-                            row.insertCell(row.cells.length).textContent = phase.Keterangan || '';     // Keterangan
-                        });
-                    });
-                } else {
-                    listBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data proyek yang ditemukan.</td></tr>';
-                }
+<div id="alertModal" class="modal generic-modal">
+    <div class="modal-content">
+        <div class="modal-header" id="alertModalHeader">
+            <span id="alertModalIcon">✅</span>
+             <h2 id="alertModalTitle">Sukses</h2>
+             <span class="close-btn" data-modal="alertModal">&times;</span>
+        </div>
+        <p id="alertModalMessage" style="white-space: pre-wrap;"></p>
+        <div class="form-actions" style="justify-content: center; margin-top: 10px;">
+            <button type="button" class="btn" data-modal="alertModal" data-lang-key="btn_ok" style="background-color: var(--primary-color);">OK</button>
+        </div>
+    </div>
+</div>
 
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                listBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Terjadi kesalahan saat memuat data dari server. Cek SCRIPT_URL Anda.</td></tr>';
+<script>
+    // --- 1. DATA, KONFIGURASI, DAN HELPER GLOBAL ---
+    
+    // !!! PERHATIAN PENTING !!!
+    // GANTI URL_DEPLOYMENT_ANDA_DI_SINI dengan URL Web App Apps Script yang sudah Anda deploy.
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwviulMH14FEIyfLAlN4eII-NjyGWhj_0049_M_9hSOvfTc5JLI-e76z1Mec6v7pMeH/exec'; 
+    
+    let jobs = []; 
+    let currentLang = localStorage.getItem('appLang') || 'id'; 
+    
+    // Element Selector Helper (Didefinisikan paling awal)
+    const getEl = (id) => document.getElementById(id);
+    const getLang = () => TRANSLATIONS[currentLang];
+    
+    const jobList = getEl('jobList');
+    const languageToggleBtn = getEl('languageToggleBtn');
+
+    // Status/Phase Options 
+    const STATUS_OPTIONS = ['status_todo', 'status_inprogress', 'status_done', 'status_blocked', 'status_cancelled', 'status_selesai'];
+    const PHASE_OPTIONS = ['phase_planning', 'phase_implementation', 'phase_testing', 'phase_deployment', 'phase_revision'];
+
+    // --- TRANSLATION DATA ---
+    const TRANSLATIONS = {
+        id: {
+            // UI Umum
+            app_title: "Modern Job Tracker ✨",
+            main_title: "Modern Job Tracker ✨",
+            lang_toggle_btn: "Ganti Bahasa: EN",
+            
+            // Tombol Aksi
+            btn_add_new_job: "➕ Tambah Pekerjaan Baru",
+            btn_delete_job: "❌ Hapus Pekerjaan",
+            btn_delete_history: "🗑️ Hapus Riwayat", 
+            btn_update_status: "Update Status",
+            btn_edit_history: "📝 Edit Riwayat",
+            btn_cancel: "Batal",
+            btn_add_job: "Tambahkan Pekerjaan",
+            btn_save: "Simpan",
+            btn_ok: "OK",
+            
+            // Status dan Fase (untuk badge dan select)
+            status_todo: "To Do",
+            status_inprogress: "In Progress",
+            status_done: "Done",
+            status_blocked: "Blocked",
+            status_cancelled: "Dibatalkan",
+            status_selesai: "Selesai",
+            phase_planning: "Perencanaan",
+            phase_implementation: "Implementasi",
+            phase_testing: "Testing",
+            phase_deployment: "Deployment",
+            phase_revision: "Revisi", 
+            
+            // Pesan dan Teks Khusus
+            text_update_prefix: "Update:", 
+            text_job_completed: "SELESAI TOTAL",
+            text_done: "Selesai",
+            text_no_jobs: "Belum ada pekerjaan. Tambahkan pekerjaan baru!",
+            text_date_done: "Tgl Selesai:",
+            text_target_date: "Tgl Target:",
+            text_pic: "PIC:",
+            text_phase: "Fase:",
+            text_status: "Status:",
+            text_notes: "Keterangan:",
+            
+            // Modal Tambah
+            modal_new_job_title: "Tambah Pekerjaan Baru",
+            label_job_name: "Nama Pekerjaan:",
+            label_pic_initial: "PIC Awal:",
+            label_phase_initial: "Fase Awal:",
+            label_target_date: "Tanggal Target:",
+            label_status: "Status:",
+            label_notes: "Keterangan:",
+            
+            // Modal Update/Edit
+            modal_update_title: "Update Status Baru",
+            modal_edit_title: "Edit Riwayat",
+            label_pic_new: "PIC Baru:", 
+            label_phase_new: "Fase Baru:",
+            label_status_new: "Status Baru:",
+            label_target_date_new: "Tanggal Target Baru:",
+            label_date_done_new: "Tanggal Selesai (Jika Done):",
+            label_notes_new: "Keterangan Baru:",
+            
+            // Modal Generik Titles
+            modal_confirm_delete_job: "Konfirmasi Hapus Pekerjaan",
+            modal_confirm_delete_history: "Konfirmasi Hapus Riwayat",
+            modal_alert_success_title: "Aksi Berhasil",
+            modal_alert_error_title: "Peringatan Validasi",
+            
+            // Alert/Konfirmasi Messages
+            alert_delete_job_confirm: (name) => `Apakah Anda yakin ingin menghapus pekerjaan **"${name}"** beserta seluruh riwayatnya?\n\nTindakan ini tidak dapat dibatalkan.`,
+            alert_delete_job_success: (name) => `Pekerjaan "**${name}**" berhasil dihapus.`,
+            alert_delete_history_confirm: (date, name) => `Apakah Anda yakin ingin menghapus riwayat update pada tanggal **${date}** untuk pekerjaan **"${name}"**?`,
+            alert_delete_history_success: (date) => `Riwayat update pada tanggal **${date}** berhasil dihapus.`,
+            alert_invalid_phase_status: "Fase saat ini tidak dapat diubah menjadi **Fase Revisi** kecuali statusnya Blocked atau Cancelled.",
+            alert_history_is_initial: (name) => `Anda tidak dapat menghapus riwayat awal pekerjaan **${name}**.`,
+            alert_history_is_last: (name) => `Anda tidak dapat menghapus riwayat terakhir/terbaru untuk pekerjaan **${name}**. Harap buat update baru terlebih dahulu.`,
+            alert_api_error: (msg) => `Terjadi kesalahan pada API Google Sheet:\n${msg}`
+        },
+        en: {
+            // UI Umum
+            app_title: "Modern Job Tracker ✨",
+            main_title: "Modern Job Tracker ✨",
+            lang_toggle_btn: "Switch Language: ID",
+
+            // Tombol Aksi
+            btn_add_new_job: "➕ Add New Job",
+            btn_delete_job: "❌ Delete Job",
+            btn_delete_history: "🗑️ Delete History", 
+            btn_update_status: "Update Status",
+            btn_edit_history: "📝 Edit History",
+            btn_cancel: "Cancel",
+            btn_add_job: "Add Job",
+            btn_save: "Save",
+            btn_ok: "OK",
+
+            // Status dan Fase
+            status_todo: "To Do",
+            status_inprogress: "In Progress",
+            status_done: "Done",
+            status_blocked: "Blocked",
+            status_cancelled: "Cancelled",
+            status_selesai: "Completed",
+            phase_planning: "Planning",
+            phase_implementation: "Implementation",
+            phase_testing: "Testing",
+            phase_deployment: "Deployment",
+            phase_revision: "Revision", 
+
+            // Pesan dan Teks Khusus
+            text_update_prefix: "Update:", 
+            text_job_completed: "TOTAL COMPLETED",
+            text_done: "Done",
+            text_no_jobs: "No jobs yet. Add a new job!",
+            text_date_done: "Done Date:",
+            text_target_date: "Target Date:",
+            text_pic: "PIC:",
+            text_phase: "Phase:",
+            text_status: "Status:",
+            text_notes: "Notes:",
+
+            // Modal Tambah
+            modal_new_job_title: "Add New Job",
+            label_job_name: "Job Name:",
+            label_pic_initial: "Initial PIC:",
+            label_phase_initial: "Initial Phase:",
+            label_target_date: "Target Date:",
+            label_status: "Status:",
+            label_notes: "Notes:",
+
+            // Modal Update/Edit
+            modal_update_title: "Update New Status",
+            modal_edit_title: "Edit History",
+            label_pic_new: "New PIC:", 
+            label_phase_new: "New Phase:",
+            label_status_new: "New Status:",
+            label_target_date_new: "New Target Date:",
+            label_date_done_new: "Done Date (If Done):",
+            label_notes_new: "New Notes:",
+            
+            // Modal Generik Titles
+            modal_confirm_delete_job: "Confirm Delete Job",
+            modal_confirm_delete_history: "Confirm Delete History",
+            modal_alert_success_title: "Action Successful",
+            modal_alert_error_title: "Validation Warning",
+
+            // Alert/Konfirmasi Messages
+            alert_delete_job_confirm: (name) => `Are you sure you want to delete job **"${name}"** and all its history?\n\nThis action cannot be undone.`,
+            alert_delete_job_success: (name) => `Job "**${name}**" successfully deleted.`,
+            alert_delete_history_confirm: (date, name) => `Are you sure you want to delete the update history on **${date}** for job **"${name}"**?`,
+            alert_delete_history_success: (date) => `History update on **${date}** successfully deleted.`,
+            alert_invalid_phase_status: "The current phase cannot be changed to **Revision Phase** unless the status is Blocked or Cancelled.",
+            alert_history_is_initial: (name) => `You cannot delete the initial history of job **${name}**.`,
+            alert_history_is_last: (name) => `You cannot delete the last/latest history for job **${name}**. Please create a new update first.`,
+            alert_api_error: (msg) => `An error occurred in the Google Sheet API:\n${msg}`
+        }
+    };
+
+    // --- 2. FUNGSI UTILITY & CRUD (API INTEGRATION) ---
+
+    /**
+     * Mengirim permintaan ke Apps Script Web App.
+     * @param {string} action Aksi yang akan dilakukan (createJob, updateJob, dll.)
+     * @param {object} data Payload yang akan dikirim.
+     * @returns {Promise<object>} Objek hasil dari Apps Script.
+     */
+    async function sendApiRequest(action, data) {
+        if (GAS_API_URL === 'GANTI_URL_DEPLOYMENT_ANDA_DI_SINI') {
+            showAlertDialog('modal_alert_error_title', 'URL API Google Apps Script belum diset. Harap deploy Apps Script dan ganti variabel GAS_API_URL.', true);
+            throw new Error('API URL Not Set');
+        }
+        
+        try {
+            const response = await fetch(GAS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8' // Penting untuk Apps Script doPost
+                },
+                body: JSON.stringify({ action, ...data })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (!result.success && result.error) {
+                throw new Error(result.error);
+            }
+
+            return result;
+        } catch (error) {
+            console.error('API Request Failed:', error);
+            showAlertDialog('modal_alert_error_title', getLang().alert_api_error(error.message), true);
+            throw error; 
+        }
+    }
+    
+    // FUNGSI PENGGANTI loadJobsFromLocalStorage
+    async function fetchJobsFromSheet() {
+        try {
+            const response = await fetch(GAS_API_URL); // GET request
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Data yang dikembalikan sudah dalam format yang benar [{jobId, name, history:[...]}]
+            jobs = result;
+            
+        } catch (error) {
+            console.error('Failed to load jobs from Sheet:', error);
+            // Jika gagal, inisialisasi jobs sebagai array kosong
+            jobs = []; 
+        }
+        // Setelah load, render data
+        renderJobs();
+    }
+    
+    function formatDate(dateInput) {
+        if (!dateInput) return '';
+        let dateObject;
+        
+        if (dateInput instanceof Date) {
+            dateObject = dateInput;
+        } else if (typeof dateInput === 'string' && dateInput.split('-').length === 3) {
+            if (dateInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                 const parts = dateInput.split('-');
+                 dateObject = new Date(parts[0], parts[1] - 1, parts[2]);
+            } else if (dateInput.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                 return dateInput;
+            } else {
+                 return dateInput;
+            }
+        } else {
+            const parts = dateInput.split('-');
+            if (parts.length === 3) {
+                 dateObject = new Date(parts[0], parts[1] - 1, parts[2]);
+            } else {
+                 return dateInput;
             }
         }
+        
+        const day = String(dateObject.getDate()).padStart(2, '0');
+        const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+        const year = dateObject.getFullYear();
+        
+        return `${day}-${month}-${year}`;
+    }
+    
+    function getSortableDate(dateString) {
+         if (!dateString || dateString.length !== 10) return 0;
+        const parts = dateString.split('-'); // [DD, MM, YYYY]
+        if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+             return parseInt(parts[2] + parts[1] + parts[0]);
+        }
+        return 0;
+    }
 
-        // FUNGSI UNTUK MENGIRIM DATA PROYEK BARU
-        document.getElementById('projectForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const messageElement = document.getElementById('message');
-            messageElement.textContent = 'Sedang mengirim data...';
-            messageElement.style.color = 'blue';
+    function sortHistory(history) {
+         history.sort((a, b) => {
+            const dateA = getSortableDate(a.date);
+            const dateB = getSortableDate(b.date);
+            return dateA - dateB; 
+        });
+        return history;
+    }
 
-            // Siapkan data untuk dikirim ke Google Apps Script (doPost)
-            const formData = new FormData(form);
-            formData.append('action', 'addPhase'); // Aksi di Apps Script harus disesuaikan
+
+    function toggleModal(modalId, show) {
+        const modal = getEl(modalId);
+        if (show) {
+            modal.classList.add('is-visible');
+        } else {
+            modal.classList.remove('is-visible');
+            if (modalId === 'newJobModal') getEl('newJobForm').reset();
             
+            if (modalId === 'updateJobModal') {
+                getEl('updateJobForm').reset();
+                getEl('historyIndexToUpdate').value = ''; 
+                getEl('jobIndexToUpdate').value = ''; 
+                getEl('dateDoneGroup').style.display = 'none';
+                getEl('updateDateDone').removeAttribute('required');
+                getEl('updateSubmitBtn').textContent = getLang().btn_update_status;
+                getEl('updateModalTitle').textContent = getLang().modal_update_title;
+                
+                getEl('updateTargetDate').removeAttribute('readonly');
+                getEl('updateTargetDate').style.backgroundColor = 'white';
+            }
+        }
+    }
+    
+    // FUNGSI MODAL GENERIK
+    
+    function showConfirmationModal(titleKey, message, onConfirm) {
+        const lang = getLang();
+        
+        getEl('confirmModalTitle').textContent = lang[titleKey] || titleKey;
+        getEl('confirmModalMessage').innerHTML = message.replace(/\n/g, '<br>'); 
+        
+        const confirmBtn = getEl('confirmActionBtn');
+        if (titleKey.includes('job')) {
+            confirmBtn.textContent = lang.btn_delete_job.replace('❌ ', '');
+        } else if (titleKey.includes('history')) {
+            confirmBtn.textContent = lang.btn_delete_history.replace('🗑️ ', '');
+        } else {
+             confirmBtn.textContent = lang.btn_save;
+        }
+
+        confirmBtn.onclick = () => {
+            toggleModal('confirmationModal', false);
+            onConfirm();
+        };
+
+        toggleModal('confirmationModal', true);
+    }
+    
+    function showAlertDialog(titleKey, message, isError = false) {
+        const lang = getLang();
+        
+        getEl('alertModalTitle').textContent = lang[titleKey] || titleKey;
+        getEl('alertModalMessage').innerHTML = message.replace(/\n/g, '<br>');
+        
+        const iconEl = getEl('alertModalIcon');
+        
+        if (isError) {
+            iconEl.textContent = '⚠️';
+            iconEl.style.color = 'var(--error-color)';
+        } else {
+            iconEl.textContent = '✅';
+            iconEl.style.color = 'var(--success-color)';
+        }
+        
+        toggleModal('alertModal', true);
+    }
+
+    function getBadgeClass(text) {
+        return `status-badge ${text.toLowerCase().replace(/\s/g, '-')}`;
+    }
+
+    async function deleteJob(jobIndex) {
+        const job = jobs[jobIndex];
+        const jobName = job.name;
+        const jobId = job.jobId; 
+        const lang = getLang();
+        
+        const message = lang.alert_delete_job_confirm(jobName);
+        
+        showConfirmationModal('modal_confirm_delete_job', message, async () => {
             try {
-                // Perbaiki format tanggal sebelum dikirim
-                const completedDate = document.getElementById('completedDate').value;
-                if (completedDate) {
-                    formData.set('completedDate', completedDate); 
-                } else {
-                    formData.delete('completedDate'); // Hapus jika kosong
-                }
+                await sendApiRequest('deleteJob', { jobId });
+                await fetchJobsFromSheet(); 
+                showAlertDialog('modal_alert_success_title', lang.alert_delete_job_success(jobName));
+            } catch (e) {
+                // Ditangani di sendApiRequest
+            }
+        });
+    }
+    window.deleteJob = deleteJob;
+    
+    async function deleteHistory(jobIndex, historyIndex) {
+        const job = jobs[jobIndex];
+        const historyEntry = job.history[historyIndex];
+        const date = historyEntry.date;
+        const historyId = historyEntry.historyId; 
+        const lang = getLang();
+        
+        if (historyIndex === 0) {
+             showAlertDialog('modal_alert_error_title', lang.alert_history_is_initial(job.name), true);
+             return;
+        }
+        if (historyIndex === job.history.length - 1) {
+             showAlertDialog('modal_alert_error_title', lang.alert_history_is_last(job.name), true);
+             return;
+        }
 
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData,
-                });
-                
-                const result = await response.json();
-                
-                if (result.result === 'success') {
-                    messageElement.textContent = result.message;
-                    messageElement.style.color = 'green';
-                    form.reset(); // Bersihkan formulir
-                    fetchProjects(); // Muat ulang data setelah sukses
-                } else {
-                    messageElement.textContent = 'Error: ' + (result.message || 'Terjadi kesalahan pada server.');
-                    messageElement.style.color = 'red';
-                }
+        const message = lang.alert_delete_history_confirm(date, job.name);
+        
+        showConfirmationModal('modal_confirm_delete_history', message, async () => {
+            try {
+                await sendApiRequest('deleteHistory', { historyId });
+                await fetchJobsFromSheet(); 
+                showAlertDialog('modal_alert_success_title', lang.alert_delete_history_success(date));
+            } catch (e) {
+                // Ditangani di sendApiRequest
+            }
+        });
+    }
+    window.deleteHistory = deleteHistory;
 
-            } catch (error) {
-                console.error('Error submitting data:', error);
-                messageElement.textContent = 'Terjadi kesalahan jaringan/server.';
-                messageElement.style.color = 'red';
+    function openUpdateForm(jobIndex, historyIndex) {
+        const job = jobs[jobIndex];
+        const h = job.history[historyIndex];
+        const lang = getLang();
+        const updateStatusSelect = getEl('updateStatus');
+        const updatePhaseSelect = getEl('updatePhase');
+        const updateTargetDateInput = getEl('updateTargetDate');
+        const updatePicInput = getEl('updatePic'); 
+
+        getEl('jobIndexToUpdate').value = jobIndex;
+        getEl('historyIndexToUpdate').value = historyIndex;
+        getEl('updateJobForm').setAttribute('data-job-id', job.jobId);
+        getEl('updateJobForm').setAttribute('data-history-id', h.historyId);
+        
+        updateSelectOptions(updateStatusSelect, STATUS_OPTIONS, h.status);
+        updateSelectOptions(updatePhaseSelect, PHASE_OPTIONS, h.phase);
+
+        const isLatestHistory = (historyIndex === job.history.length - 1);
+
+        updatePicInput.value = h.pic || ''; 
+
+        if (!isLatestHistory) {
+            updateTargetDateInput.setAttribute('readonly', 'readonly');
+            updateTargetDateInput.style.backgroundColor = 'var(--bg-light)'; 
+        } else {
+            updateTargetDateInput.removeAttribute('readonly');
+            updateTargetDateInput.style.backgroundColor = 'white'; 
+        }
+
+        if (isLatestHistory) {
+            getEl('updateModalTitle').textContent = lang.modal_update_title;
+            getEl('updateSubmitBtn').textContent = lang.btn_update_status;
+            
+            if (historyIndex !== 0) {
+                getEl('updateNotes').value = ''; 
+            } else {
+                getEl('updateNotes').value = h.notes;
+            }
+
+            getEl('updatePhase').value = h.phase; 
+            getEl('updateStatus').value = h.status;
+            updateTargetDateInput.value = h.targetDate.split('-').reverse().join('-'); 
+        } else {
+            getEl('updateModalTitle').textContent = (historyIndex === 0) ? `${lang.modal_edit_title} Awal: ${job.name}` : lang.modal_edit_title;
+            getEl('updateSubmitBtn').textContent = lang.btn_save;
+            getEl('updateNotes').value = h.notes;
+            updateTargetDateInput.value = h.targetDate.split('-').reverse().join('-'); 
+            updatePhaseSelect.value = h.phase;
+            updateStatusSelect.value = h.status;
+        }
+        
+        const isDoneStatus = (h.status === 'status_done' || h.status === 'status_selesai');
+        const dateDoneGroup = getEl('dateDoneGroup');
+        const updateDateDoneInput = getEl('updateDateDone');
+
+        if (isDoneStatus || !isLatestHistory || historyIndex === 0) { 
+            dateDoneGroup.style.display = 'block';
+            
+            if (h.dateDone && h.dateDone.length === 10 && h.dateDone.includes('-')) {
+                updateDateDoneInput.value = h.dateDone.split('-').reverse().join('-');
+            } else if (isDoneStatus && isLatestHistory) {
+                updateDateDoneInput.value = new Date().toISOString().slice(0, 10);
+            } else {
+                updateDateDoneInput.value = '';
+            }
+
+            updateDateDoneInput.removeAttribute('required');
+
+        } else {
+            dateDoneGroup.style.display = 'none';
+            updateDateDoneInput.value = '';
+            updateDateDoneInput.removeAttribute('required');
+        }
+
+        updateStatusSelect.onchange = function() {
+            const selectedStatus = updateStatusSelect.value;
+            const isSelectedDoneStatus = (selectedStatus === 'status_done' || selectedStatus === 'status_selesai');
+
+            if (isSelectedDoneStatus) {
+                dateDoneGroup.style.display = 'block';
+                if (!updateDateDoneInput.value) {
+                     updateDateDoneInput.value = new Date().toISOString().slice(0, 10);
+                }
+            } else {
+                dateDoneGroup.style.display = 'none';
+                updateDateDoneInput.value = '';
+            }
+        };
+
+        toggleModal('updateJobModal', true);
+    }
+    window.openUpdateForm = openUpdateForm;
+
+    // --- 3. FUNGSI RENDER UTAMA ---
+    function renderJobs() {
+        jobList.innerHTML = ''; 
+        const lang = getLang();
+        
+        if (jobs.length === 0) {
+            jobList.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--secondary-color); background-color: white; border-radius: 10px; box-shadow: var(--shadow-sm);">${lang.text_no_jobs}</div>`;
+            return;
+        }
+
+        jobs.forEach((job, index) => {
+            job.history = sortHistory(job.history); 
+            
+            const latestHistory = job.history[job.history.length - 1];
+            const latestStatusText = lang[latestHistory.status] || latestHistory.status;
+            
+            const jobGroup = document.createElement('div');
+            jobGroup.className = 'timeline-job-group';
+
+            const latestHistoryIndex = job.history.length - 1;
+
+            const summaryHeader = document.createElement('div');
+            summaryHeader.className = 'job-summary-header';
+            summaryHeader.innerHTML = `
+                <strong>${job.name}</strong>
+                <div class="summary-status">
+                     <button 
+                         onclick="openUpdateForm(${index}, ${latestHistoryIndex})" 
+                         class="btn" 
+                         style="background-color: var(--accent-color); font-size: 0.75em; padding: 5px 10px; border-radius: 6px;"
+                     >${lang.btn_update_status}</button>
+                     <span class="${getBadgeClass(latestStatusText)}">${latestStatusText}</span>
+                     <button onclick="deleteJob(${index})" class="btn" style="background-color: var(--error-color);">${lang.btn_delete_job}</button>
+                </div>
+            `;
+            jobGroup.appendChild(summaryHeader);
+
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'timeline-events';
+            
+            const reversedHistory = [...job.history].reverse();
+            
+            reversedHistory.forEach((h, hIndexReversed) => {
+                const hIndex = job.history.length - 1 - hIndexReversed; 
+                
+                const statusText = lang[h.status] || h.status;
+                const phaseText = lang[h.phase] || h.phase;
+                const isLatest = (hIndex === job.history.length - 1);
+                
+                const eventNode = document.createElement('div');
+                eventNode.className = 'timeline-event';
+                eventNode.setAttribute('data-status-key', h.status);
+
+                const eventContent = document.createElement('div');
+                eventContent.className = 'event-content';
+
+                const dateDisplay = isLatest 
+                    ? `Update Terbaru: ${formatDate(h.date)}`
+                    : `Riwayat Update: ${formatDate(h.date)}`;
+
+                let dateDoneHtml = h.dateDone 
+                    ? `<div><strong>${lang.text_date_done}</strong> ${formatDate(h.dateDone)}</div>` 
+                    : '';
+
+                eventContent.innerHTML = `
+                    <span class="event-date">${dateDisplay}</span>
+                    <div class="event-details">
+                        <div><strong>${lang.text_status}</strong> <span class="${getBadgeClass(statusText)}">${statusText}</span></div>
+                        <div><strong>${lang.text_phase}</strong> <span class="${getBadgeClass(phaseText)}">${phaseText}</span></div>
+                        <div><strong>${lang.text_pic}</strong> ${h.pic}</div>
+                        <div><strong>${lang.text_target_date}</strong> ${formatDate(h.targetDate)}</div>
+                        ${dateDoneHtml}
+                        <div class="notes"><strong>${lang.text_notes}</strong> ${h.notes || '-'}</div>
+                    </div>
+                    <div class="event-actions">
+                        <button onclick="openUpdateForm(${index}, ${hIndex})" class="btn" style="background-color: var(--warning-color); color: var(--secondary-color);">${lang.btn_edit_history}</button>
+                        ${(hIndex > 0 && !isLatest) ? 
+                            `<button onclick="deleteHistory(${index}, ${hIndex})" class="btn" style="background-color: var(--error-color);">${lang.btn_delete_history}</button>` : ''
+                        }
+                    </div>
+                `;
+                
+                eventNode.appendChild(eventContent);
+                eventsContainer.appendChild(eventNode);
+            });
+
+            jobGroup.appendChild(eventsContainer);
+            jobList.appendChild(jobGroup);
+        });
+    }
+
+    // --- 4. LOGIKA TAMBAH/UPDATE PEKERJAAN & EVENT LISTENERS UI ---
+
+    // LOGIKA TAMBAH PEKERJAAN BARU
+    getEl('newJobForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const name = getEl('newJobName').value;
+        const pic = getEl('newPic').value;
+        const phaseKey = getEl('newPhase').value;
+        const targetDateRaw = getEl('newTargetDate').value;
+        const statusKey = getEl('newStatus').value;
+        const notes = getEl('newNotes').value;
+
+        const isDoneStatus = (statusKey === 'status_done' || statusKey === 'status_selesai');
+
+        const initialHistoryData = {
+            name: name,
+            date: formatDate(new Date()), 
+            phase: phaseKey,
+            targetDate: formatDate(targetDateRaw), 
+            dateDone: isDoneStatus ? formatDate(new Date()) : '',
+            status: statusKey,
+            notes: notes,
+            pic: pic
+        };
+
+        try {
+            await sendApiRequest('createJob', { data: initialHistoryData });
+            
+            await fetchJobsFromSheet(); 
+            toggleModal('newJobModal', false); 
+            showAlertDialog('modal_alert_success_title', `Pekerjaan "**${name}**" berhasil ditambahkan!`);
+        } catch (e) {
+            // Ditangani di sendApiRequest
+        }
+    });
+    
+    // LOGIKA UPDATE/EDIT PEKERJAAN
+    getEl('updateJobForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const lang = getLang();
+
+        const jobIndex = parseInt(getEl('jobIndexToUpdate').value);
+        const historyIndex = parseInt(getEl('historyIndexToUpdate').value);
+        const isLatestHistory = (historyIndex === jobs[jobIndex].history.length - 1);
+        const job = jobs[jobIndex];
+        
+        const jobId = e.target.getAttribute('data-job-id');
+        const historyId = e.target.getAttribute('data-history-id');
+
+        const newPic = getEl('updatePic').value; 
+        const newPhase = getEl('updatePhase').value;
+        const newStatus = getEl('updateStatus').value;
+        const newTargetDateRaw = getEl('updateTargetDate').value; 
+        const newDateDoneRaw = getEl('updateDateDone').value;
+        const newNotes = getEl('updateNotes').value;
+
+        const newTargetDate = formatDate(newTargetDateRaw); 
+        const newDateDone = newDateDoneRaw ? formatDate(newDateDoneRaw) : '';
+        
+        const isDoneStatus = (newStatus === 'status_done' || newStatus === 'status_selesai');
+
+        if (newPhase === 'phase_revision' && !(newStatus === 'status_blocked' || newStatus === 'status_cancelled')) {
+             showAlertDialog('modal_alert_error_title', lang.alert_invalid_phase_status, true);
+             return;
+        }
+
+        const dataToUpdate = {
+            name: job.name, 
+            pic: newPic, 
+            phase: newPhase,
+            targetDate: newTargetDate, 
+            dateDone: isDoneStatus ? newDateDone : '', 
+            status: newStatus,
+            notes: newNotes,
+            date: formatDate(new Date()) 
+        };
+
+        let successMessage = '';
+        let apiAction = '';
+
+        if (isLatestHistory && getEl('updateSubmitBtn').textContent === lang.btn_update_status) {
+            apiAction = 'updateJob'; 
+            // Untuk update Job, kita hanya perlu mengirim data riwayat baru
+            dataToUpdate.name = job.name; 
+            
+            successMessage = `Pekerjaan **${job.name}** berhasil diupdate dengan status **${lang[newStatus]}** dan Fase **${lang[newPhase]}**`;
+        } else {
+            apiAction = 'editHistory'; 
+            // Untuk edit History, kita perlu mengirim historyId
+            dataToUpdate.historyId = historyId;
+            // Data yang dikirim ke Apps Script untuk editHistory tidak memerlukan field date, tapi Apps Script akan mengambilnya dari sheet. 
+            // Karena kita hanya mengedit baris yang sudah ada, kita hanya perlu mengirim data kolom yang berubah.
+            // Di Apps Script, kita menggunakan historyId untuk menemukan baris dan memperbarui kolom 5-10.
+            
+            successMessage = `Riwayat pada tanggal **${job.history[historyIndex].date}** untuk pekerjaan **${job.name}** berhasil diubah.`;
+        }
+
+        try {
+            await sendApiRequest(apiAction, { 
+                jobId: jobId, 
+                historyId: historyId, 
+                data: dataToUpdate,
+            });
+            
+            await fetchJobsFromSheet(); 
+            toggleModal('updateJobModal', false); 
+            showAlertDialog('modal_alert_success_title', successMessage);
+        } catch (e) {
+            // Ditangani di sendApiRequest
+        }
+    });
+
+    // FUNGSI TRANSLASI
+    function translateUI() {
+        const lang = getLang();
+
+        getEl('appTitle').textContent = lang.app_title;
+        getEl('mainTitle').textContent = lang.main_title;
+        
+        languageToggleBtn.textContent = lang.lang_toggle_btn;
+
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (lang[key] && typeof lang[key] === 'string') {
+                el.textContent = lang[key];
             }
         });
 
-        // Panggil fungsi untuk memuat data saat halaman dimuat
-        window.onload = fetchProjects;
+        updateSelectOptions(getEl('newStatus'), STATUS_OPTIONS, getEl('newStatus').value);
+        updateSelectOptions(getEl('updateStatus'), STATUS_OPTIONS, getEl('updateStatus').value);
+        updateSelectOptions(getEl('newPhase'), PHASE_OPTIONS, getEl('newPhase').value);
+        updateSelectOptions(getEl('updatePhase'), PHASE_OPTIONS, getEl('updatePhase').value);
+        
+        getEl('confirmModalTitle').textContent = lang.modal_confirm_delete_job.split(' ')[0]; 
+        getEl('alertModalTitle').textContent = lang.modal_alert_success_title.split(' ')[0]; 
+        getEl('confirmActionBtn').textContent = lang.btn_save; 
+        
+        renderJobs();
+    }
+    
+    function updateSelectOptions(selectElement, optionsArray, selectedValue) {
+        if (!selectElement) return;
+        const lang = getLang();
+        selectElement.innerHTML = '';
+        
+        optionsArray.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key; 
+            option.textContent = lang[key];
+            selectElement.appendChild(option);
+        });
+        
+        let foundSelected = false;
+        Array.from(selectElement.options).forEach(opt => {
+             if (opt.textContent === selectedValue || opt.value === selectedValue) {
+                opt.selected = true;
+                foundSelected = true;
+             }
+        });
+        
+        if (!foundSelected && selectElement.options.length > 0) {
+            selectElement.options[0].selected = true;
+        }
+    }
 
-    </script>
+    // EVENT LISTENERS UI
+    getEl('openNewJobModalBtn').addEventListener('click', () => {
+        updateSelectOptions(getEl('newPhase'), PHASE_OPTIONS, getEl('newPhase').value);
+        updateSelectOptions(getEl('newStatus'), STATUS_OPTIONS, getEl('newStatus').value);
+        
+        toggleModal('newJobModal', true);
+        getEl('newTargetDate').valueAsDate = new Date();
+    });
+
+    languageToggleBtn.addEventListener('click', () => {
+        currentLang = (currentLang === 'id') ? 'en' : 'id';
+        localStorage.setItem('appLang', currentLang);
+        translateUI();
+    });
+
+    document.querySelectorAll('.close-btn, .btn-secondary[data-modal], #alertModal .btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const modalId = e.target.dataset.modal || e.target.closest('.modal').id;
+            toggleModal(modalId, false);
+        });
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            toggleModal(event.target.id, false);
+        }
+    });
+
+
+    // --- 5. INISIALISASI ---
+    // Panggil fungsi baru untuk memuat dari Google Sheet
+    fetchJobsFromSheet(); 
+    translateUI(); 
+</script>
+
 </body>
 </html>
