@@ -480,7 +480,9 @@
             max-width: 550px; 
             position: relative;
             animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
-            box-sizing: border-box; /* Tambahkan ini untuk responsivitas horizontal */
+            box-sizing: border-box; 
+            /* >>> PERUBAHAN UTAMA: Tambahkan ini untuk rata tengah konten */
+            text-align: center; 
         }
         
         @media (max-width: 550px) {
@@ -510,6 +512,8 @@
             margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
+            /* KOREKSI: Setel ulang perataan di dalam header */
+            text-align: left; 
         }
 
         .modal-header h2 {
@@ -530,6 +534,8 @@
         
         .form-group {
             margin-bottom: 20px;
+            /* KOREKSI: Setel ulang perataan untuk form groups agar label rata kiri */
+            text-align: left; 
         }
 
         label {
@@ -538,6 +544,8 @@
             font-weight: 600;
             color: var(--secondary-color);
             font-size: 0.95em;
+            /* KOREKSI: Pastikan label tidak terpengaruh oleh text-align: center */
+            text-align: left;
         }
 
         input[type="text"], input[type="date"], textarea, select {
@@ -576,12 +584,13 @@
         
         .generic-modal .modal-content {
             max-width: 400px;
-            text-align: center;
+            /* text-align: center; Dihapus karena sudah diatur di .modal-content umum */
         }
 
         .generic-modal .modal-header {
              justify-content: center;
              margin-bottom: 10px;
+             text-align: center; /* Override default modal-header text-align */
         }
         
         .generic-modal .modal-header h2 {
@@ -603,10 +612,8 @@
             color: var(--text-color);
             margin-bottom: 25px;
             font-weight: 400;
-        }
-        
-        #confirmActionBtn {
-            background-color: var(--error-color);
+            /* Pastikan pesan rata tengah */
+            text-align: center; 
         }
         
         #confirmModalMessage strong {
@@ -1253,10 +1260,6 @@
              showAlertDialog('modal_alert_error_title', lang.alert_history_is_initial(job.name), true);
              return;
         }
-        if (historyIndex === job.history.length - 1) {
-             showAlertDialog('modal_alert_error_title', lang.alert_history_is_last(job.name), true);
-             return;
-        }
 
         const message = lang.alert_delete_history_confirm(date, job.name);
         
@@ -1330,7 +1333,7 @@
         const dateDoneGroup = getEl('dateDoneGroup');
         const updateDateDoneInput = getEl('updateDateDone');
 
-        if (isDoneStatus || !isLatestHistory || historyIndex === 0) { 
+        if ( historyIndex === 0) { 
             dateDoneGroup.style.display = 'block';
             
             if (h.dateDone && h.dateDone.length === 10 && h.dateDone.includes('-')) {
@@ -1841,4 +1844,4 @@
 </script>
 
 </body>
-</html>
+</html>   
