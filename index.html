@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Tracker - Google Sheets DB</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f4f7f6;
+        }
+        h1, h2 { 
+            color: #333; 
+        }
+        form { 
+            margin-bottom: 30px; 
+            padding: 25px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        input, select { 
+            margin-bottom: 15px; 
+            padding: 10px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button { 
+            padding: 12px 20px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        th, td { 
+            border: 1px solid #e0e0e0; 
+            padding: 10px; 
+            text-align: left; 
+            vertical-align: top; /* Penting untuk rowspan */
+        }
+        th { 
+            background-color: #e9ecef; 
+            color: #495057;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Project Tracker App</h1>
+    
+    <form id="projectForm">
+        <h2>Tambahkan Fase/Task Baru</h2>
+        <input type="number" id="no" name="no" placeholder="No. Tugas (misal: 1)" required>
+        <input type="text" id="task" name="task" placeholder="Nama Tugas Utama (misal: Periode Closing Akunting)" required>
+        <input type="text" id="phase" name="phase" placeholder="Phase/Langkah (misal: Development/Revisi)" required>
+        <input type="text" id="pic" name="pic" placeholder="Penanggung Jawab (PIC)" required>
+        <input type="number" id="chk" name="chk" placeholder="CHK" required>
+        <label for="targetDate">Target Date:</label>
+        <input type="date" id="targetDate" name="targetDate" required>
+        <label for="completedDate">Completed Date:</label>
+        <input type="date" id="completedDate" name="completedDate">
+        <select id="status" name="status" required>
+            <option value="">Pilih Status</option>
+            <option value="Not Started">Belum Dimulai</option>
+            <option value="In Progress">Sedang Berjalan</option>
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+        </select>
+        <input type="text" id="keterangan" name="keterangan" placeholder="Keterangan / Catatan" required>
+
+        <button type="submit">Tambah Phase</button>
+        <p id="message"></p>
+    </form>
+    
+    <hr>
+
+    <h2>📋 Daftar Proyek dan Phase</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Task</th>
+                <th>Phase</th>
+                <th>PIC</th>
+                <th>CHK</th>
+                <th>Target Date</th>
+                <th>Completed Date</th>
+                <th>Status</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody id="projectList">
+            <tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        // PASTIKAN ANDA MENGGANTI INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPN3VrDJyUq9PTi8MMCHKTJKXXnuWRbpjjSQP9k6d_bkbQBSsY-_g6uk3KG69tkfH9/exec"; 
+        
+        // FUNGSI UNTUK MENGAMBIL DATA PROYEK DENGAN GROUPING
+        async function fetchProjects() {
+            const listBody = document.getElementById('projectList');
+            listBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>';
+            
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+                
+                listBody.innerHTML = ''; // Kosongkan tabel
+
+                if (result.result === 'success' && result.data && result.data.length > 0) {
+                    
+                    // 1. Mengelompokkan data berdasarkan No. dan Task
+                    const groupedProjects = result.data.reduce((acc, currentPhase) => {
+                        // Gabungkan No dan Task menjadi satu kunci unik
+                        const key = currentPhase.No + "|" + currentPhase.Task;
+                        if (!acc[key]) {
+                            acc[key] = {
+                                No: currentPhase.No,
+                                Task: currentPhase.Task,
+                                Phases: []
+                            };
+                        }
+                        acc[key].Phases.push(currentPhase);
+                        return acc;
+                    }, {});
+
+                    // 2. Menampilkan data yang sudah dikelompokkan
+                    Object.values(groupedProjects).forEach(project => {
+                        let firstRow = true;
+                        const totalPhases = project.Phases.length;
+
+                        project.Phases.forEach(phase => {
+                            const row = listBody.insertRow();
+                            
+                            // Baris Pertama (Header Proyek) - Menggunakan rowspan
+                            if (firstRow) {
+                                const cellNo = row.insertCell(0);
+                                cellNo.textContent = project.No; 
+                                cellNo.rowSpan = totalPhases;
+                                cellNo.style.backgroundColor = '#f8f9fa'; // Warna latar belakang untuk header grup
+
+                                const cellTask = row.insertCell(1);
+                                cellTask.textContent = project.Task; 
+                                cellTask.rowSpan = totalPhases;
+                                cellTask.style.backgroundColor = '#f8f9fa';
+
+                                firstRow = false;
+                            } 
+                            
+                            // Kolom Detail (Phase) - Mulai dari index ke-2
+                            row.insertCell(row.cells.length).textContent = phase.Phase || '';           // Phase
+                            row.insertCell(row.cells.length).textContent = phase.PIC || '';            // PIC
+                            row.insertCell(row.cells.length).textContent = phase.CHK || '';            // CHK
+                            row.insertCell(row.cells.length).textContent = phase.TargetDate ? new Date(phase.TargetDate).toLocaleDateString() : '';     // Target Date (Format tanggal)
+                            row.insertCell(row.cells.length).textContent = phase.CompletedDate ? new Date(phase.CompletedDate).toLocaleDateString() : '';  // Completed Date (Format tanggal)
+                            row.insertCell(row.cells.length).textContent = phase.Status || '';         // Status
+                            row.insertCell(row.cells.length).textContent = phase.Keterangan || '';     // Keterangan
+                        });
+                    });
+                } else {
+                    listBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data proyek yang ditemukan.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                listBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Terjadi kesalahan saat memuat data dari server. Cek SCRIPT_URL Anda.</td></tr>';
+            }
+        }
+
+        // FUNGSI UNTUK MENGIRIM DATA PROYEK BARU
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = 'Sedang mengirim data...';
+            messageElement.style.color = 'blue';
+
+            // Siapkan data untuk dikirim ke Google Apps Script (doPost)
+            const formData = new FormData(form);
+            formData.append('action', 'addPhase'); // Aksi di Apps Script harus disesuaikan
+            
+            try {
+                // Perbaiki format tanggal sebelum dikirim
+                const completedDate = document.getElementById('completedDate').value;
+                if (completedDate) {
+                    formData.set('completedDate', completedDate); 
+                } else {
+                    formData.delete('completedDate'); // Hapus jika kosong
+                }
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const result = await response.json();
+                
+                if (result.result === 'success') {
+                    messageElement.textContent = result.message;
+                    messageElement.style.color = 'green';
+                    form.reset(); // Bersihkan formulir
+                    fetchProjects(); // Muat ulang data setelah sukses
+                } else {
+                    messageElement.textContent = 'Error: ' + (result.message || 'Terjadi kesalahan pada server.');
+                    messageElement.style.color = 'red';
+                }
+
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                messageElement.textContent = 'Terjadi kesalahan jaringan/server.';
+                messageElement.style.color = 'red';
+            }
+        });
+
+        // Panggil fungsi untuk memuat data saat halaman dimuat
+        window.onload = fetchProjects;
+
+    </script>
+</body>
+</html>
