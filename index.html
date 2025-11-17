@@ -1772,8 +1772,18 @@
 
     // --- 7. INISIALISASI ---
     loadSettings(); // 1. Muat pengaturan kustom
-    fetchJobsFromSheet(); // 2. Muat data pekerjaan
-    translateUI(); // 3. Perbarui UI dan Select Options
+    
+    // 2. Event Listener untuk Tombol Ganti Bahasa (FIXED)
+    languageToggleBtn.addEventListener('click', () => {
+        currentLang = (currentLang === 'id') ? 'en' : 'id';
+        localStorage.setItem('appLang', currentLang);
+        translateUI();
+    });
+    
+    // 3. Muat data pekerjaan dan perbarui UI
+    fetchJobsFromSheet(); 
+    translateUI(); 
+
 </script>
 
 </body>
