@@ -104,7 +104,7 @@
             white-space: nowrap; 
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) { /* Modifikasi untuk loading state */
             background-color: #1d4ed8;
             transform: translateY(-1px);
             box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.1);
@@ -116,7 +116,7 @@
             font-size: 0.8em;
             box-shadow: none;
         }
-        #languageToggleBtn:hover {
+        #languageToggleBtn:hover:not(:disabled) { /* Modifikasi untuk loading state */
             background-color: #4b5563;
         }
         
@@ -620,6 +620,55 @@
             font-weight: 700;
             color: var(--secondary-color);
         }
+
+        /* ======================================= */
+        /* 7. LOADING OVERLAY STYLING (BARU) */
+        /* ======================================= */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Dark semi-transparent background */
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 2000; /* Di atas modal */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .loading-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            border: 5px solid var(--light-text-color); 
+            border-top: 5px solid var(--primary-color); /* Blue spinner */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Style saat tombol sedang disabled/loading */
+        .btn:disabled {
+            background-color: #9ca3af !important; /* Abu-abu untuk disabled */
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -798,6 +847,10 @@
     </div>
 </div>
 
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+</div>
+
 
 <script>
     // --- 1. DATA, KONFIGURASI, DAN HELPER GLOBAL ---
@@ -814,6 +867,18 @@
     
     const jobList = getEl('jobList');
     const languageToggleBtn = getEl('languageToggleBtn');
+    
+    // NEW: Loading Overlay Element
+    const loadingOverlay = getEl('loadingOverlay');
+
+    // Fungsi untuk menampilkan/menyembunyikan loading overlay (BARU)
+    function toggleLoading(show) {
+        if (show) {
+            loadingOverlay.classList.add('is-visible');
+        } else {
+            loadingOverlay.classList.remove('is-visible');
+        }
+    }
     
     // Daftarkan event listener untuk tombol 'Tambah Pekerjaan Baru'
     getEl('openNewJobModalBtn').addEventListener('click', () => {
@@ -962,7 +1027,7 @@
             
             // Alert/Konfirmasi Messages
             alert_delete_job_confirm: (name) => `Apakah Anda yakin ingin menghapus pekerjaan **"${name}"** beserta seluruh riwayatnya?\n\nTindakan ini tidak dapat dibatalkan.`,
-            alert_delete_job_success: (name) => `Pekerjaan "**${name}**" berhasil dihapus.`,
+            alert_delete_job_success: (name) => `Pekerjaan "**${name}"** berhasil dihapus.`,
             alert_delete_history_confirm: (date, name) => `Apakah Anda yakin ingin menghapus riwayat update pada tanggal **${date}** untuk pekerjaan **"${name}"**?`,
             alert_delete_history_success: (date) => `Riwayat update pada tanggal **${date}** berhasil dihapus.`,
             alert_invalid_phase_status: "Fase saat ini tidak dapat diubah menjadi **Fase Revisi** kecuali statusnya Blocked atau Cancelled.",
@@ -1061,7 +1126,9 @@
     // --- 2. FUNGSI UTILITY & CRUD (API INTEGRATION) ---
 
     async function sendApiRequest(action, data) {
-        
+        // NEW: Tampilkan loading
+        toggleLoading(true);
+
         try {
             const response = await fetch(GAS_API_URL, {
                 method: 'POST',
@@ -1086,10 +1153,16 @@
             console.error('API Request Failed:', error);
             showAlertDialog('modal_alert_error_title', getLang().alert_api_error(error.message), true);
             throw error; 
+        } finally {
+            // NEW: Sembunyikan loading setelah selesai (berhasil atau gagal)
+            toggleLoading(false);
         }
     }
     
     async function fetchJobsFromSheet() {
+        // NEW: Tampilkan loading
+        toggleLoading(true);
+
         try {
             const response = await fetch(GAS_API_URL);
             
@@ -1108,6 +1181,9 @@
         } catch (error) {
             console.error('Failed to load jobs from Sheet:', error);
             jobs = []; 
+        } finally {
+            // NEW: Sembunyikan loading
+            toggleLoading(false);
         }
         renderJobs();
     }
@@ -1238,6 +1314,7 @@
         const message = lang.alert_delete_job_confirm(jobName);
         
         showConfirmationModal('modal_confirm_delete_job', message, async () => {
+             // Operasi async sudah ditangani loading-nya di sendApiRequest
             try {
                 await sendApiRequest('deleteJob', { jobId });
                 await fetchJobsFromSheet(); 
@@ -1264,6 +1341,7 @@
         const message = lang.alert_delete_history_confirm(date, job.name);
         
         showConfirmationModal('modal_confirm_delete_history', message, async () => {
+             // Operasi async sudah ditangani loading-nya di sendApiRequest
             try {
                 await sendApiRequest('deleteHistory', { historyId });
                 await fetchJobsFromSheet(); 
@@ -1478,6 +1556,9 @@
 
     getEl('newJobForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const submitBtn = e.submitter; // NEW: Dapatkan tombol submit
+        submitBtn.disabled = true; // NEW: Nonaktifkan tombol
+        
         const lang = getLang();
 
         const name = getEl('newJobName').value;
@@ -1508,11 +1589,16 @@
             showAlertDialog('modal_alert_success_title', `Pekerjaan "**${name}**" berhasil ditambahkan!`);
         } catch (e) {
             // Ditangani di sendApiRequest
+        } finally {
+            submitBtn.disabled = false; // NEW: Aktifkan kembali tombol
         }
     });
     
     getEl('updateJobForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const submitBtn = e.submitter; // NEW: Dapatkan tombol submit
+        submitBtn.disabled = true; // NEW: Nonaktifkan tombol
+        
         const lang = getLang();
 
         const jobIndex = parseInt(getEl('jobIndexToUpdate').value);
@@ -1537,6 +1623,7 @@
 
         if (newPhase === 'phase_revision' && !(newStatus === 'status_blocked' || newStatus === 'status_cancelled')) {
              showAlertDialog('modal_alert_error_title', lang.alert_invalid_phase_status, true);
+             submitBtn.disabled = false; // NEW: Aktifkan kembali tombol jika ada validasi error
              return;
         }
 
@@ -1582,6 +1669,8 @@
             showAlertDialog('modal_alert_success_title', successMessage);
         } catch (e) {
             // Ditangani di sendApiRequest
+        } finally {
+            submitBtn.disabled = false; // NEW: Aktifkan kembali tombol
         }
     });
 
@@ -1626,6 +1715,9 @@
     // Fungsi untuk menambah opsi kustom
     function addCustomOption(e, isStatus) {
         e.preventDefault();
+        const submitBtn = e.submitter; // NEW: Dapatkan tombol submit
+        submitBtn.disabled = true; // NEW: Nonaktifkan tombol
+        
         const lang = getLang();
         
         const form = e.target;
@@ -1639,6 +1731,7 @@
 
         if (!name) {
             showAlertDialog('modal_alert_error_title', lang.alert_custom_option_empty, true);
+            submitBtn.disabled = false; // NEW: Aktifkan kembali tombol
             return;
         }
         
@@ -1667,6 +1760,7 @@
             counter++;
             if (counter > 100) { // Safety break
                 console.error("Key generation loop limit reached.");
+                submitBtn.disabled = false; 
                 return;
             }
         }
@@ -1689,6 +1783,8 @@
         translateUI(); 
 
         showAlertDialog('modal_alert_success_title', lang.alert_custom_option_success(name, type));
+        
+        submitBtn.disabled = false; // NEW: Aktifkan kembali tombol
     }
     
     // Fungsi untuk menghapus opsi kustom
@@ -1703,6 +1799,7 @@
         }
         
         showConfirmationModal('modal_confirm_delete_history', `Apakah Anda yakin ingin menghapus opsi kustom **${customOptions[key]}** (ID: ${key})?`, () => {
+             // Tidak perlu toggleLoading di sini karena ini operasi sinkron lokal (localStorage)
              delete customOptions[key];
              delete TRANSLATIONS.id[key];
              delete TRANSLATIONS.en[key];
@@ -1844,4 +1941,4 @@
 </script>
 
 </body>
-</html>   
+</html>
